@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.Qt import *
 from configparser import ConfigParser
 from c12306 import C12306
+from c12306 import C12306Error
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QByteArray
 from PyQt5.QtCore import QTimer
@@ -49,7 +50,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self._config.write(configfile)
             configfile.close()
 
-        self._my12306.login(username, password, auth_code)
+        try:
+            self._my12306.login(username, password, auth_code)
+            self.memo.append('登陆成功!')
+        except C12306Error as e:
+            self.memo.append(e.value)
 
 
     def show_auth_code(self):
