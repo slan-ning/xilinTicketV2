@@ -85,4 +85,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
     def interval_search(self):
-        self.memo.append("cc")
+        try:
+            self._my12306.search_ticket('慈利','乌鲁木齐','2014-04-16')
+        except C12306Error as e:
+            self.memo.append(e.value)
+
+        self.memo.append("查询一次")

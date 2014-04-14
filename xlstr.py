@@ -9,6 +9,6 @@ def substr(src_str:str, first:str, end:str):
     :param end:结束字符串
     :return:
     """
-    start=src_str.find(first)
-    end=src_str.find(end, src_str.find(first))
+    start=src_str.find(first)+len(first)
+    end=src_str.find(end, src_str.find(first)+1)
     return src_str[start:end]
