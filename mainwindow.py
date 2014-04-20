@@ -37,6 +37,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             password = config_dict['password']
             self.edit_username.setText(username)
             self.edit_password.setText(password)
+            self.edit_from_station.setText(config_dict['fromstation'])
+            self.edit_to_station.setText(config_dict['tostation'])
+            self.slider.setValue(int(config_dict['interval']))
+            self.dateControl.setDate(QDate.fromString(config_dict['traindate'],"yyyy-MM-dd"))
+            self.passager_table.load_from_config()
         except:
             pass
 
@@ -74,6 +79,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.to_station = self.edit_to_station.text()
             self.train_date = self.dateControl.date().toString("yyyy-MM-dd")
 
+            self._config.set('DEFAULT', 'fromstation', self.from_station)
+            self._config.set('DEFAULT', 'tostation', self.to_station)
+            self._config.set('DEFAULT', 'traindate', self.train_date)
+            self._config.set('DEFAULT', 'interval', str(self.slider.sliderPosition()))
+
+            with open('config.ini', 'w') as configfile:
+                self._config.write(configfile)
+                configfile.close()
+            self.passager_table.save_to_config()
+
             #定时执行
             self._timer=QTimer()
             self._timer.timeout.connect(self.interval_search)
@@ -86,8 +101,44 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def interval_search(self):
         try:
-            self._my12306.search_ticket('慈利','乌鲁木齐','2014-04-16')
+            data=self._my12306.search_ticket(self.from_station,self.to_station,self.train_date)
+            ticketList=self.get_need_seat(data)
+
+            for ticket in ticketList:
+                self.buyTicket(ticket)
+
         except C12306Error as e:
             self.memo.append(e.value)
 
-        self.memo.append("查询一次")
+    def get_need_seat(self,ticketInfo):
+        ticketList=[]
+        needSeatNum=len(self.passager_table.selectedPassenger())
+
+        for info in ticketInfo:
+            if self.cb_first_seat.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['zy_num'],needSeatNum):
+                ticketList.append(info)
+            elif self.cb_second_seat.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['ze_num'],needSeatNum):
+                ticketList.append(info)
+            elif self.cb_soft_bed.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['rw_num'],needSeatNum):
+                ticketList.append(info)
+            elif self.cb_hard_bed.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['yw_num'],needSeatNum):
+                ticketList.append(info)
+            elif self.cb_hard_seat.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['yz_num'],needSeatNum):
+                ticketList.append(info)
+            elif self.cb_stand.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['wz_num'],needSeatNum):
+                ticketList.append(info)
+
+        return ticketList
+
+    def is_ticket_enough(self,ticketNumStr,needNum):
+        if ticketNumStr in ('--','*','无') :
+            return False
+        if ticketNumStr=='有':
+            return True
+
+        return int(ticketNumStr)>needNum
+
+    def buyTicket(self,ticket):
+        pass
+
+

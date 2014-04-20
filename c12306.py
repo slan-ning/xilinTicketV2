@@ -89,15 +89,6 @@ class C12306:
         return ticketInfo['data']
 
 
-    def is_ticket_enough(self,ticketNumStr,needNum):
-        if ticketNumStr in ('--','*','无') :
-            return False
-        if ticketNumStr=='有':
-            return True
-
-        return int(ticketNumStr)>needNum
-
-
 
 class C12306Error(Exception):
     def __init__(self, val):
