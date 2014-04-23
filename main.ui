@@ -356,6 +356,9 @@
          <property name="text">
           <string>二等座</string>
          </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
         </widget>
         <widget class="QCheckBox" name="cb_soft_bed">
          <property name="geometry">
@@ -382,6 +385,9 @@
          <property name="text">
           <string>硬卧</string>
          </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
         </widget>
         <widget class="QCheckBox" name="cb_hard_seat">
          <property name="geometry">
@@ -394,6 +400,9 @@
          </property>
          <property name="text">
           <string>硬座</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
         <widget class="QCheckBox" name="cb_stand">

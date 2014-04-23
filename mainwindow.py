@@ -9,6 +9,7 @@ from c12306 import C12306Error
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QByteArray
 from PyQt5.QtCore import QTimer
+from ticket import Ticket
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -116,17 +117,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         for info in ticketInfo:
             if self.cb_first_seat.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['zy_num'],needSeatNum):
-                ticketList.append(info)
+                ticketList.append(Ticket(info,'M'))
             elif self.cb_second_seat.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['ze_num'],needSeatNum):
-                ticketList.append(info)
+                ticketList.append(Ticket(info,'0'))
             elif self.cb_soft_bed.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['rw_num'],needSeatNum):
-                ticketList.append(info)
+                ticketList.append(Ticket(info,'4'))
             elif self.cb_hard_bed.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['yw_num'],needSeatNum):
-                ticketList.append(info)
+                ticketList.append(Ticket(info,'3'))
             elif self.cb_hard_seat.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['yz_num'],needSeatNum):
-                ticketList.append(info)
+                ticketList.append(Ticket(info,'1'))
             elif self.cb_stand.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['wz_num'],needSeatNum):
-                ticketList.append(info)
+                ticketList.append(Ticket(info,'1'))
 
         return ticketList
 

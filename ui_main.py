@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'E:\project\XilinTicket\main.ui'
+# Form implementation generated from reading ui file 'E:\project\python\xilin_ticket\main.ui'
 #
-# Created: Mon Mar 31 00:20:47 2014
+# Created: Wed Apr 23 23:35:23 2014
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -132,15 +132,18 @@ class Ui_MainWindow(object):
         self.cb_first_seat.setObjectName("cb_first_seat")
         self.cb_second_seat = QtWidgets.QCheckBox(self.groupBox_4)
         self.cb_second_seat.setGeometry(QtCore.QRect(120, 280, 91, 19))
+        self.cb_second_seat.setChecked(True)
         self.cb_second_seat.setObjectName("cb_second_seat")
         self.cb_soft_bed = QtWidgets.QCheckBox(self.groupBox_4)
         self.cb_soft_bed.setGeometry(QtCore.QRect(20, 300, 91, 19))
         self.cb_soft_bed.setObjectName("cb_soft_bed")
         self.cb_hard_bed = QtWidgets.QCheckBox(self.groupBox_4)
         self.cb_hard_bed.setGeometry(QtCore.QRect(120, 300, 91, 19))
+        self.cb_hard_bed.setChecked(True)
         self.cb_hard_bed.setObjectName("cb_hard_bed")
         self.cb_hard_seat = QtWidgets.QCheckBox(self.groupBox_4)
         self.cb_hard_seat.setGeometry(QtCore.QRect(20, 320, 91, 19))
+        self.cb_hard_seat.setChecked(True)
         self.cb_hard_seat.setObjectName("cb_hard_seat")
         self.cb_stand = QtWidgets.QCheckBox(self.groupBox_4)
         self.cb_stand.setGeometry(QtCore.QRect(120, 320, 91, 19))

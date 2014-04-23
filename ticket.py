@@ -1,17 +1,11 @@
 __author__ = 'Administrator'
 import requests
 import xlstr
+import time
 
 
 class Ticket:
-    #座位信息
-    first_seat = ''
-    second_seat = ''
-    soft_bed = ''
-    hard_bed = ''
-    hard_seat = ''
-
-    #车站信息
+    #车票信息
     train_no = ''
     station_train_code = ''  #车次编号，例如K540
     from_station_telecode = ''
@@ -27,24 +21,22 @@ class Ticket:
     train_date = ''
     seat_type = ''
 
-    def __init__(self, ticket_str:str):
-        self.train_no = xlstr.substr(ticket_str, "train_no\":\"", "\"")
-        self.from_station_telecode = xlstr.substr(ticket_str, "from_station_telecode\":\"", "\"")
-        self.from_station_name = xlstr.substr(ticket_str, "from_station_name\":\"", "\"")
-        self.to_station_telecode = xlstr.substr(ticket_str, "to_station_telecode\":\"", "\"")
-        self.to_station_name = xlstr.substr(ticket_str, "to_station_name\":\"", "\"")
-        self.yp_info = xlstr.substr(ticket_str, "yp_info\":\"", "\"")
-        self.start_train_date = xlstr.substr(ticket_str, "start_train_date\":\"", "\"")
-        self.train_date = ''#xlstr.DateFormat(self.start_train_date, "%Y-%m-%d")
-        self.location_code = xlstr.substr(ticket_str, "location_code\":\"", "\"")
-        self.secret_str = xlstr.substr(ticket_str, "secretStr\":\"", "\"")
-        self.station_train_code = xlstr.substr(ticket_str, "station_train_code\":\"", "\"")
+    def __init__(self, ticket_obj, buy_type):
+        self.train_no = ticket_obj['queryLeftNewDTO']['train_no']
+        self.from_station_telecode = ticket_obj['queryLeftNewDTO']['from_station_telecode']
+        self.from_station_name = ticket_obj['queryLeftNewDTO']['from_station_name']
+        self.to_station_telecode = ticket_obj['queryLeftNewDTO']['to_station_telecode']
+        self.to_station_name = ticket_obj['queryLeftNewDTO']['to_station_name']
+        self.yp_info = ticket_obj['queryLeftNewDTO']['yp_info']
+        self.start_train_date = ticket_obj['queryLeftNewDTO']['start_train_date']
+        self.location_code = ticket_obj['queryLeftNewDTO']['location_code']
+        self.secret_str = ticket_obj['secretStr']
+        self.station_train_code = ticket_obj['queryLeftNewDTO']['station_train_code']
 
-        self.first_seat = xlstr.substr(ticket_str, "\"zy_num\":\"", "\"")
-        self.second_seat = xlstr.substr(ticket_str, "\"ze_num\":\"", "\"")
-        self.soft_bed = xlstr.substr(ticket_str, "\"rw_num\":\"", "\"")
-        self.hard_bed = xlstr.substr(ticket_str, "\"yw_num\":\"", "\"")
-        self.hard_seat = xlstr.substr(ticket_str, "\"yz_num\":\"", "\"")
+        trainTime = time.strptime(self.start_train_date, '%Y%m%d')
+        self.train_date = time.strftime('%Y-%m-%d', trainTime)
 
-    def login(self):
-        pass
+        self.seat_type = buy_type
+
+
+SeatType={'M':'一等座','0':'二等座','4':'软卧','3':'硬卧','1':'硬座/无坐'}
