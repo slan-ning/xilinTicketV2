@@ -140,6 +140,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         return int(ticketNumStr)>needNum
 
     def buyTicket(self,ticket):
+
         pass
 
 

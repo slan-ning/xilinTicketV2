@@ -88,6 +88,30 @@ class C12306:
 
         return ticketInfo['data']
 
+    def submit_order(self,ticket):
+        data={'secretStr':ticket.secret_str,'train_date':ticket.train_date,'back_train_date':ticket.train_date,\
+              'tour_flag':'dc','purpose_codes':'ADULT','query_from_station_name':ticket.from_station_name,\
+              'query_to_station_name':ticket.to_station_name,'undefined':''}
+        headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init','X-Requested-With':'XMLHttpRequest'}
+
+        res=self.http.post('https://kyfw.12306.cn/otn/leftTicket/submitOrderRequest',data,verify=False,headers=headers)
+
+        orderInfo=res.json()
+        if orderInfo['status']!=True:
+            raise C12306Error('提交订单错误:'+orderInfo['messages'])
+
+        res=self.http.post('https://kyfw.12306.cn/otn/confirmPassenger/initDc',{'_json_att':''},verify=False,headers=headers)
+        pageText=res.text
+
+        self.Token=xlstr.substr(pageText,"globalRepeatSubmitToken = '","'")
+        self.keyCheck=xlstr.substr(pageText,"'key_check_isChange':'","'")
+        self.leftTicketStr=xlstr.substr(pageText,"leftTicketStr':'","'")
+        self.trainLocation=xlstr.substr(pageText,"train_location':'","'")
+
+        return True
+
+
+
 
 
 class C12306Error(Exception):
