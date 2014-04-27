@@ -44,6 +44,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.edit_password.setText(password)
             self.edit_from_station.setText(config_dict['fromstation'])
             self.edit_to_station.setText(config_dict['tostation'])
+            self.edit_train_num.setText(config_dict['specified_train'])
             self.slider.setValue(int(config_dict['interval']))
             self.dateControl.setDate(QDate.fromString(config_dict['traindate'],"yyyy-MM-dd"))
             self.passager_table.load_from_config()
@@ -85,7 +86,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
     def query_interval_changed(self, value):
-        self.lb_speed_num.setText(str(value) + "s")
+        self.lb_speed_num.setText(str(value/2) + "s")
 
     def search(self, start: bool):
         if start:
@@ -97,6 +98,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self._config.set('DEFAULT', 'tostation', self.to_station)
             self._config.set('DEFAULT', 'traindate', self.train_date)
             self._config.set('DEFAULT', 'interval', str(self.slider.sliderPosition()))
+            self._config.set('DEFAULT','specified_train',self.edit_train_num.text())
 
             with open('config.ini', 'w') as configfile:
                 self._config.write(configfile)
@@ -106,7 +108,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             #定时执行
             self._timer=QTimer()
             self._timer.timeout.connect(self.interval_search)
-            self._timer.start(self.slider.sliderPosition()*1000)
+            self._timer.start(self.slider.sliderPosition()*500)
             self.searchBtn.setText('停止')
         else:
             self._timer.stop()
@@ -133,8 +135,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def get_need_seat(self,ticketInfo):
         ticketList=[]
         needSeatNum=len(self.passager_table.selectedPassenger())
+        specified_train=self.edit_train_num.text().strip()
 
         for info in ticketInfo:
+            if specified_train!='' and info['queryLeftNewDTO']['station_train_code'] not in specified_train:
+                continue
             if self.cb_first_seat.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['zy_num'],needSeatNum):
                 ticketList.append(Ticket(info,'M'))
             elif self.cb_second_seat.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['ze_num'],needSeatNum):

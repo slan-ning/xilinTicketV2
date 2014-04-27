@@ -147,7 +147,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>3s</string>
+         <string>2s</string>
         </property>
        </widget>
        <widget class="QGroupBox" name="group_query">
@@ -285,7 +285,7 @@
           <x>10</x>
           <y>160</y>
           <width>351</width>
-          <height>341</height>
+          <height>351</height>
          </rect>
         </property>
         <property name="title">
@@ -297,7 +297,7 @@
            <x>10</x>
            <y>20</y>
            <width>331</width>
-           <height>251</height>
+           <height>221</height>
           </rect>
          </property>
          <property name="font">
@@ -368,7 +368,7 @@
          <property name="geometry">
           <rect>
            <x>20</x>
-           <y>280</y>
+           <y>250</y>
            <width>91</width>
            <height>19</height>
           </rect>
@@ -381,7 +381,7 @@
          <property name="geometry">
           <rect>
            <x>120</x>
-           <y>280</y>
+           <y>250</y>
            <width>91</width>
            <height>19</height>
           </rect>
@@ -397,7 +397,7 @@
          <property name="geometry">
           <rect>
            <x>20</x>
-           <y>300</y>
+           <y>270</y>
            <width>91</width>
            <height>19</height>
           </rect>
@@ -410,7 +410,7 @@
          <property name="geometry">
           <rect>
            <x>120</x>
-           <y>300</y>
+           <y>270</y>
            <width>91</width>
            <height>19</height>
           </rect>
@@ -426,7 +426,7 @@
          <property name="geometry">
           <rect>
            <x>20</x>
-           <y>320</y>
+           <y>290</y>
            <width>91</width>
            <height>19</height>
           </rect>
@@ -442,13 +442,36 @@
          <property name="geometry">
           <rect>
            <x>120</x>
-           <y>320</y>
+           <y>290</y>
            <width>91</width>
            <height>19</height>
           </rect>
          </property>
          <property name="text">
           <string>无座</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="edit_train_num">
+         <property name="geometry">
+          <rect>
+           <x>100</x>
+           <y>320</y>
+           <width>241</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_4">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>320</y>
+           <width>72</width>
+           <height>15</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>指定车次：</string>
          </property>
         </widget>
        </widget>
@@ -529,7 +552,7 @@
          <number>1</number>
         </property>
         <property name="maximum">
-         <number>5</number>
+         <number>10</number>
         </property>
         <property name="singleStep">
          <number>1</number>
@@ -538,7 +561,7 @@
          <number>1</number>
         </property>
         <property name="value">
-         <number>3</number>
+         <number>4</number>
         </property>
         <property name="tracking">
          <bool>true</bool>
