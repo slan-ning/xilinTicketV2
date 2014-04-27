@@ -10,5 +10,5 @@ def substr(src_str:str, first:str, end:str):
     :return:
     """
     start=src_str.find(first)+len(first)
-    end=src_str.find(end, src_str.find(first)+1)
+    end=src_str.find(end, src_str.find(first)+len(first))
     return src_str[start:end]

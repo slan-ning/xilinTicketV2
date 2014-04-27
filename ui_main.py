@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'E:\project\python\xilin_ticket\main.ui'
 #
-# Created: Wed Apr 23 23:35:23 2014
+# Created: Sun Apr 27 22:18:11 2014
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -14,6 +14,9 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setWindowModality(QtCore.Qt.WindowModal)
         MainWindow.resize(977, 656)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/img/hack.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
@@ -34,13 +37,6 @@ class Ui_MainWindow(object):
         self.edit_password = QtWidgets.QLineEdit(self.horizontalLayoutWidget)
         self.edit_password.setObjectName("edit_password")
         self.horizontalLayout.addWidget(self.edit_password)
-        self.label_3 = QtWidgets.QLabel(self.horizontalLayoutWidget)
-        self.label_3.setObjectName("label_3")
-        self.horizontalLayout.addWidget(self.label_3)
-        self.edit_auth_code = QtWidgets.QLineEdit(self.horizontalLayoutWidget)
-        self.edit_auth_code.setMaximumSize(QtCore.QSize(60, 16777215))
-        self.edit_auth_code.setObjectName("edit_auth_code")
-        self.horizontalLayout.addWidget(self.edit_auth_code)
         self.lb_auth_img = ClickedLabel(self.horizontalLayoutWidget)
         self.lb_auth_img.setMinimumSize(QtCore.QSize(100, 24))
         self.lb_auth_img.setMaximumSize(QtCore.QSize(100, 40))
@@ -48,6 +44,13 @@ class Ui_MainWindow(object):
         self.lb_auth_img.setText("")
         self.lb_auth_img.setObjectName("lb_auth_img")
         self.horizontalLayout.addWidget(self.lb_auth_img)
+        self.label_3 = QtWidgets.QLabel(self.horizontalLayoutWidget)
+        self.label_3.setObjectName("label_3")
+        self.horizontalLayout.addWidget(self.label_3)
+        self.edit_auth_code = QtWidgets.QLineEdit(self.horizontalLayoutWidget)
+        self.edit_auth_code.setMaximumSize(QtCore.QSize(60, 16777215))
+        self.edit_auth_code.setObjectName("edit_auth_code")
+        self.horizontalLayout.addWidget(self.edit_auth_code)
         self.loginBtn = QtWidgets.QPushButton(self.horizontalLayoutWidget)
         self.loginBtn.setObjectName("loginBtn")
         self.horizontalLayout.addWidget(self.loginBtn)
@@ -70,7 +73,7 @@ class Ui_MainWindow(object):
         self.lb_speed_num.setGeometry(QtCore.QRect(201, 20, 71, 20))
         self.lb_speed_num.setObjectName("lb_speed_num")
         self.group_query = QtWidgets.QGroupBox(self.groupBox_2)
-        self.group_query.setGeometry(QtCore.QRect(10, 50, 341, 91))
+        self.group_query.setGeometry(QtCore.QRect(10, 50, 341, 101))
         self.group_query.setObjectName("group_query")
         self.edit_from_station = QtWidgets.QLineEdit(self.group_query)
         self.edit_from_station.setGeometry(QtCore.QRect(20, 20, 71, 21))
@@ -87,13 +90,20 @@ class Ui_MainWindow(object):
         self.dateControl.setDate(QtCore.QDate(2014, 9, 14))
         self.dateControl.setObjectName("dateControl")
         self.searchBtn = QtWidgets.QToolButton(self.group_query)
-        self.searchBtn.setGeometry(QtCore.QRect(130, 50, 71, 31))
+        self.searchBtn.setGeometry(QtCore.QRect(80, 60, 71, 31))
         self.searchBtn.setCheckable(True)
         self.searchBtn.setChecked(False)
         self.searchBtn.setAutoRepeat(False)
         self.searchBtn.setObjectName("searchBtn")
+        self.lb_buy_img = ClickedLabel(self.group_query)
+        self.lb_buy_img.setGeometry(QtCore.QRect(230, 50, 100, 40))
+        self.lb_buy_img.setMinimumSize(QtCore.QSize(100, 24))
+        self.lb_buy_img.setMaximumSize(QtCore.QSize(100, 40))
+        self.lb_buy_img.setStyleSheet("background-color:white")
+        self.lb_buy_img.setText("")
+        self.lb_buy_img.setObjectName("lb_buy_img")
         self.groupBox_4 = QtWidgets.QGroupBox(self.groupBox_2)
-        self.groupBox_4.setGeometry(QtCore.QRect(10, 150, 351, 351))
+        self.groupBox_4.setGeometry(QtCore.QRect(10, 160, 351, 341))
         self.groupBox_4.setObjectName("groupBox_4")
         self.passager_table = TableWidget(self.groupBox_4)
         self.passager_table.setGeometry(QtCore.QRect(10, 20, 331, 251))
@@ -194,7 +204,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "西邻·火车票"))
         self.label.setText(_translate("MainWindow", "帐号："))
         self.label_2.setText(_translate("MainWindow", "密码："))
         self.label_3.setText(_translate("MainWindow", "验证码："))
@@ -226,5 +236,6 @@ class Ui_MainWindow(object):
         self.btn_url_12306.setText(_translate("MainWindow", "打开12036"))
         self.lb_speed.setText(_translate("MainWindow", "间隔："))
 
-from tablewidget import TableWidget
 from clickedlabel import ClickedLabel
+from tablewidget import TableWidget
+import main_rc

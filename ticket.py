@@ -19,6 +19,7 @@ class Ticket:
 
     #乘车信息
     train_date = ''
+    train_date_utc=''
     seat_type = ''
 
     def __init__(self, ticket_obj, buy_type):
@@ -35,6 +36,7 @@ class Ticket:
 
         trainTime = time.strptime(self.start_train_date, '%Y%m%d')
         self.train_date = time.strftime('%Y-%m-%d', trainTime)
+        self.train_date_utc=time.strftime('%a %b %d %H:%M:%S UTC+0800 %Y',trainTime)
 
         self.seat_type = buy_type
 
