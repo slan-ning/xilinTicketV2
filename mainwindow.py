@@ -14,6 +14,7 @@ from ticket import Ticket
 from PyQt5.QtWidgets import QLineEdit
 from ticket import SeatType
 import time
+import webbrowser
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     _config = ConfigParser()
@@ -30,6 +31,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lb_buy_img.clicked.connect(self.show_buy_auth_image)
         self.slider.valueChanged.connect(self.query_interval_changed)
         self.searchBtn.clicked.connect(self.search)
+        self.btn_url_12306.clicked.connect(self.open_12306_site)
         #加载验证码
         self.show_login_auth_code()
         self.passager_table.create_menu()
@@ -203,5 +205,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.memo.ensureCursorVisible()
         self.memo.append(time.strftime("%m-%d %H:%M:%S ", time.localtime()) +msg)
         self.memo.moveCursor(QTextCursor.End)
+
+    def open_12306_site(self):
+        webbrowser.open("https://kyfw.12306.cn/otn/queryOrder/initNoComplete")
+
 
 

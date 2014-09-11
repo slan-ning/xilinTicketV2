@@ -78,7 +78,7 @@ class C12306:
 
         headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init'}
 
-        url='https://' + host + '/otn/leftTicket/query?leftTicketDTO.train_date='+date\
+        url='https://' + host + '/otn/leftTicket/queryT?leftTicketDTO.train_date='+date\
             +"&leftTicketDTO.from_station="+self.stationCode[fromStation]+"&leftTicketDTO.to_station="+\
             self.stationCode[toStation]+"&purpose_codes=ADULT"
 
