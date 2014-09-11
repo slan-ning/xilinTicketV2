@@ -145,7 +145,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if self.cb_first_seat.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['zy_num'],needSeatNum):
                 ticketList.append(Ticket(info,'M'))
             elif self.cb_second_seat.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['ze_num'],needSeatNum):
-                ticketList.append(Ticket(info,'0'))
+                ticketList.append(Ticket(info,'O'))
             elif self.cb_soft_bed.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['rw_num'],needSeatNum):
                 ticketList.append(Ticket(info,'4'))
             elif self.cb_hard_bed.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['yw_num'],needSeatNum):
@@ -153,7 +153,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elif self.cb_hard_seat.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['yz_num'],needSeatNum):
                 ticketList.append(Ticket(info,'1'))
             elif self.cb_stand.checkState()==Qt.Checked and self.is_ticket_enough(info['queryLeftNewDTO']['wz_num'],needSeatNum):
-                ticketList.append(Ticket(info,'1'))
+                trainCode=info['queryLeftNewDTO']['station_train_code']
+                if 'G' in trainCode or 'D' in trainCode:
+                    ticketList.append(Ticket(info,'O'))
+                else:
+                    ticketList.append(Ticket(info,'1'))
 
         return ticketList
 
@@ -163,7 +167,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if ticketNumStr=='有':
             return True
 
-        return int(ticketNumStr)>needNum
+        return int(ticketNumStr)>=needNum
 
     def buyTicket(self,ticket):
         try:
