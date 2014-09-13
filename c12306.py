@@ -8,20 +8,25 @@ import urllib.parse
 class C12306:
     username = ''
     password = ''
-    domain = 'kyfw.12306.cn'
+    domain = '59.63.173.166' #请求域名（真实连接地址）
+    host='kyfw.12306.cn' #请求的域名（host）
     http = requests.session()
     stationCode = {}
 
-    def __init__(self):
-        self.http.get("https://" + self.domain + "/otn/", verify=False)
-        res = self.http.get('https://kyfw.12306.cn/otn/login/init', verify=False)
+    def __init__(self,domain=''):
+        if domain!='':
+            self.domain=domain
+
+        headers={"host":self.host}
+        self.http.get("https://" + self.domain + "/otn/", verify=False,headers=headers)
+        res = self.http.get('https://'+self.domain+'/otn/login/init', verify=False,headers=headers)
         assert isinstance(res, requests.Response)
 
         if not '/otn/dynamicJs/loginJs' in res.text:
             raise C12306Error('初始化页面错误')
 
         dynamic_js_url = xlstr.substr(res.text, "/otn/dynamicJs/loginJs", "\"");
-        dynamic_js = self.http.get("https://kyfw.12306.cn" + dynamic_js_url, verify=False)
+        dynamic_js = self.http.get("https://"+self.domain + dynamic_js_url, verify=False,headers=headers)
         self.load_station_code()
 
     def load_station_code(self):
@@ -30,7 +35,8 @@ class C12306:
         加载车站电报码，各个请求中会用到
         :raise C12306Error:
         """
-        res = requests.get('https://kyfw.12306.cn/otn/resources/js/framework/station_name.js', verify=False)
+        header={"host":self.host}
+        res = requests.get('https://'+self.domain+'/otn/resources/js/framework/station_name.js', verify=False,headers=header)
         if res.status_code != 200:
             raise C12306Error('加载车站信息错误,请重开!')
 
@@ -51,7 +57,7 @@ class C12306:
         self.password = password
 
         data = {'loginUserDTO.user_name': self.username, 'userDTO.password': self.password, 'randCode': auth_code}
-        headers = {'X-Requested-With': 'XMLHttpRequest'}
+        headers = {'X-Requested-With': 'XMLHttpRequest','host':self.host}
 
         res = self.http.post("https://" + self.domain + "/otn/login/loginAysnSuggest", data, verify=False,
                              headers=headers)
@@ -67,18 +73,16 @@ class C12306:
             url="https://" + self.domain + "/otn/passcodeNew/getPassCodeNew.do?module=passenger&rand=randp"
         else:
             url = "https://" + self.domain + "/otn/passcodeNew/getPassCodeNew?module=" + module + "&rand=sjrand"
-        res = self.http.get(url, verify=False)
+        res = self.http.get(url, verify=False,headers={"host":self.host})
         assert isinstance(res, requests.Response)
         return res.content
 
 
-    def search_ticket(self, fromStation, toStation, date, host=''):
-        if host == '':
-            host = self.domain
+    def search_ticket(self, fromStation, toStation, date):
 
-        headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init'}
+        headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init',"host":self.host}
 
-        url='https://' + host + '/otn/leftTicket/queryT?leftTicketDTO.train_date='+date\
+        url='https://' + self.domain + '/otn/leftTicket/queryT?leftTicketDTO.train_date='+date\
             +"&leftTicketDTO.from_station="+self.stationCode[fromStation]+"&leftTicketDTO.to_station="+\
             self.stationCode[toStation]+"&purpose_codes=ADULT"
 
@@ -102,17 +106,17 @@ class C12306:
               '&tour_flag=dc&purpose_codes=ADULT&query_from_station_name='+ticket.from_station_name+\
               '&query_to_station_name='+ticket.to_station_name+'&undefined'
         headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init','X-Requested-With':'XMLHttpRequest'\
-            ,'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}
+            ,'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',"host":self.host}
 
         data=data.encode()
 
-        res=self.http.post('https://kyfw.12306.cn/otn/leftTicket/submitOrderRequest',data,verify=False,headers=headers)
+        res=self.http.post('https://'+self.domain+'/otn/leftTicket/submitOrderRequest',data,verify=False,headers=headers)
 
         orderInfo=res.json()
         if orderInfo['status']!=True:
             raise C12306Error('提交订单错误:'+''.join(orderInfo['messages']))
 
-        res=self.http.post('https://kyfw.12306.cn/otn/confirmPassenger/initDc',{'_json_att':''},verify=False,headers=headers)
+        res=self.http.post('https://'+self.domain+'/otn/confirmPassenger/initDc',{'_json_att':''},verify=False,headers=headers)
         pageText=res.text
 
         self.Token=xlstr.substr(pageText,"globalRepeatSubmitToken = '","'")
@@ -147,7 +151,7 @@ class C12306:
 
         pstr=pstr.encode()
 
-        res=self.http.post('https://kyfw.12306.cn/otn/confirmPassenger/checkOrderInfo',pstr)
+        res=self.http.post('https://'+self.domain+'/otn/confirmPassenger/checkOrderInfo',pstr,headers={"host":self.host})
 
         orderInfo=res.json()
         if orderInfo['status']!=True:
@@ -163,7 +167,7 @@ class C12306:
                  Ticket.yp_info+"&purpose_codes=00&_json_att=&REPEAT_SUBMIT_TOKEN="+self.Token
 
             pstr=pstr.encode()
-            res=self.http.post('https://kyfw.12306.cn/otn/confirmPassenger/getQueueCount',pstr).json()
+            res=self.http.post('https://'+self.domain+'/otn/confirmPassenger/getQueueCount',pstr,headers={"host":self.host}).json()
 
             if res['status']!=True:
                 raise C12306Error('查询排队队列错误:'+''.join(res['messages']))
@@ -182,7 +186,7 @@ class C12306:
              "&train_location="+self.trainLocation+"&_json_att=&REPEAT_SUBMIT_TOKEN="+self.Token
         pstr=pstr.encode()
 
-        res=self.http.post("https://kyfw.12306.cn/otn/confirmPassenger/confirmSingleForQueue",pstr).json()
+        res=self.http.post("https://"+self.domain+"/otn/confirmPassenger/confirmSingleForQueue",pstr,headers={"host":self.host}).json()
 
         if res['status']==True :
             return True
