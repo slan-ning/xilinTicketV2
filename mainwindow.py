@@ -111,6 +111,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             if self.cb_rob_mode.checkState()==Qt.Checked :
                 self.search_thread_start()
+                self.keep_online_timer=QTimer()
+                self.keep_online_timer.timeout.connect(self._my12306.keep_online)
+                self.keep_online_timer.start(10*60)
             else:
                 #定时执行
                 self._timer=QTimer()
