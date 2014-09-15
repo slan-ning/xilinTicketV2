@@ -196,7 +196,7 @@ class C12306:
             raise C12306Error('确认订单出现错误:'+res['messages'])
 
     def keep_online(self):
-        self.http.get("https://"+self.domain+"/otn/leftTicket/init",headers={"host":self.host})
+        self.http.get("https://"+self.domain+"/otn/queryOrder/initNoComplete",headers={"host":self.host})
 
 
 class C12306Error(Exception):

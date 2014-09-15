@@ -114,7 +114,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.search_thread_start()
                 self.keep_online_timer=QTimer()
                 self.keep_online_timer.timeout.connect(self._my12306.keep_online)
-                self.keep_online_timer.start(10*60)
+                self.keep_online_timer.start(5*60*1000)
             else:
                 #定时执行
                 self._timer=QTimer()
@@ -197,7 +197,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         cdnList=self.cdn_list()
         self.searchThreadList=[]
 
-        interval=self.slider.sliderPosition()
+        interval=self.slider.sliderPosition()/2
 
         for ip in cdnList:
             thread=SearchThread(self.from_station,self.to_station,self.train_date,interval,ip)
