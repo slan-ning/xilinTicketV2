@@ -94,6 +94,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def search(self, start: bool):
         if start:
+            self.buying=False
             self.from_station = self.edit_from_station.text()
             self.to_station = self.edit_to_station.text()
             self.train_date = self.dateControl.date().toString("yyyy-MM-dd")
