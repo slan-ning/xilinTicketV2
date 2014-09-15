@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'E:\project\python\xilin_ticket\main.ui'
+# Form implementation generated from reading ui file 'F:\project\python\xilin_ticket\main.ui'
 #
-# Created: Sun Apr 27 22:40:17 2014
-#      by: PyQt5 UI code generator 5.2.1
+# Created: Mon Sep 15 11:25:16 2014
+#      by: PyQt5 UI code generator 5.3.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -198,6 +198,9 @@ class Ui_MainWindow(object):
         self.slider.setTickPosition(QtWidgets.QSlider.TicksAbove)
         self.slider.setTickInterval(1)
         self.slider.setObjectName("slider")
+        self.cb_rob_mode = QtWidgets.QCheckBox(self.groupBox_2)
+        self.cb_rob_mode.setGeometry(QtCore.QRect(250, 20, 91, 19))
+        self.cb_rob_mode.setObjectName("cb_rob_mode")
         self.horizontalLayout_2.addWidget(self.groupBox_2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -242,6 +245,7 @@ class Ui_MainWindow(object):
         self.btn_my_blog.setText(_translate("MainWindow", "查看更新"))
         self.btn_url_12306.setText(_translate("MainWindow", "打开12036"))
         self.lb_speed.setText(_translate("MainWindow", "间隔："))
+        self.cb_rob_mode.setText(_translate("MainWindow", "抢票模式"))
 
 from clickedlabel import ClickedLabel
 from tablewidget import TableWidget

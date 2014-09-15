@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import QLineEdit
 from ticket import SeatType
 import time
 import webbrowser
+from searchthread import SearchThread
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     _config = ConfigParser()
@@ -107,13 +108,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 configfile.close()
             self.passager_table.save_to_config()
 
-            #定时执行
-            self._timer=QTimer()
-            self._timer.timeout.connect(self.interval_search)
-            self._timer.start(self.slider.sliderPosition()*500)
+            if self.cb_rob_mode==Qt.Checked :
+                self.search_thread_start()
+            else:
+                #定时执行
+                self._timer=QTimer()
+                self._timer.timeout.connect(self.interval_search)
+                self._timer.start(self.slider.sliderPosition()*500)
+
             self.searchBtn.setText('停止')
         else:
             self._timer.stop()
+            self.search_thread_stop()
             self.searchBtn.setText('开始')
 
 
@@ -133,6 +139,38 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         except C12306Error as e:
             self.show_message(e.value)
+
+    def cdn_list(self):
+        return ['59.63.173.166']
+
+    def search_thread_start(self):
+        cdnList=self.cdn_list()
+        self.searchThreadList=[]
+
+        interval=self.slider.sliderPosition()*500
+
+        for ip in cdnList:
+            thread=SearchThread(self.from_station,self.to_station,self.train_date,interval,ip)
+            thread.searchThreadCallback.connect(self.search_thread_callback)
+            thread.start()
+            self.searchThreadList.append(thread)
+
+    def search_thread_stop(self):
+        for thread in self.searchThreadList:
+            thread.stop()
+
+    def search_thread_callback(self,data):
+
+        ticketList=self.get_need_seat(data)
+
+        if len(ticketList)>0 :
+            self.show_message('发现有票，开始购买，如错误请重新点开始')
+            self.searchBtn.setChecked(False)
+            self.search(False)
+            for ticket in ticketList:
+                self.buyTicket(ticket)
+        else:
+            self.show_message('没有合适的票')
 
     def get_need_seat(self,ticketInfo):
         ticketList=[]

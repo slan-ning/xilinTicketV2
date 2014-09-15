@@ -582,12 +582,26 @@
          <number>1</number>
         </property>
        </widget>
+       <widget class="QCheckBox" name="cb_rob_mode">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>20</y>
+          <width>91</width>
+          <height>19</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>抢票模式</string>
+        </property>
+       </widget>
        <zorder>lb_speed</zorder>
        <zorder>slider</zorder>
        <zorder>lb_speed_num</zorder>
        <zorder>group_query</zorder>
        <zorder>groupBox_4</zorder>
        <zorder>groupBox_5</zorder>
+       <zorder>cb_rob_mode</zorder>
       </widget>
      </item>
     </layout>
