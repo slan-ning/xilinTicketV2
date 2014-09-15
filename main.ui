@@ -363,6 +363,11 @@
            <string>身份证</string>
           </property>
          </column>
+         <column>
+          <property name="text">
+           <string>票类型</string>
+          </property>
+         </column>
         </widget>
         <widget class="QCheckBox" name="cb_first_seat">
          <property name="geometry">

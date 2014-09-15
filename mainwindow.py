@@ -21,6 +21,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     _config = ConfigParser()
     _my12306 = C12306()
     _search_running = False
+    buying=False
 
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -108,7 +109,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 configfile.close()
             self.passager_table.save_to_config()
 
-            if self.cb_rob_mode==Qt.Checked :
+            if self.cb_rob_mode.checkState()==Qt.Checked :
                 self.search_thread_start()
             else:
                 #定时执行
@@ -118,10 +119,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             self.searchBtn.setText('停止')
         else:
-            self._timer.stop()
-            self.search_thread_stop()
-            self.searchBtn.setText('开始')
+            try:
+                self._timer.stop()
+            except:
+                pass
 
+            try:
+                self.search_thread_stop()
+            finally:
+                self.searchBtn.setText('开始')
 
     def interval_search(self):
         try:
@@ -141,13 +147,53 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.show_message(e.value)
 
     def cdn_list(self):
-        return ['59.63.173.166']
+        return ['175.43.124.200',\
+                '60.220.196.248',\
+                '220.165.142.51',\
+                '61.138.219.43',\
+                '182.140.147.57',\
+                '182.140.147.106',\
+                '115.231.84.169',\
+                '115.231.84.89',\
+                '42.202.148.46',\
+                '123.138.60.183',\
+                '218.59.186.75',\
+                '60.210.18.12',\
+                '60.211.208.236',\
+                '113.207.69.72',\
+                '59.63.173.166',\
+                '211.138.121.106',\
+                '211.138.121.107',\
+                '211.138.121.108',\
+                '211.138.121.109',\
+                '211.138.121.103',\
+                '211.138.121.104',\
+                '211.138.121.105',\
+                '61.188.191.87',\
+                '111.206.169.23',\
+                '123.125.92.28',\
+                '110.18.244.166',\
+                '113.200.235.30',\
+                '113.140.51.57',\
+                '162.105.28.233',\
+                '183.136.217.66',\
+                '222.216.188.98',\
+                '222.216.188.94',\
+                '220.162.97.209',\
+                '117.27.245.62',\
+                '218.92.221.212',\
+                '125.78.240.226',\
+                '115.231.82.101',\
+                '121.14.35.32',\
+                'kyfw.12306.cn.lxdns.com',\
+                '12306v.xdwscache.glb0.lxdns.com',\
+                '125.221.95.107']
 
     def search_thread_start(self):
         cdnList=self.cdn_list()
         self.searchThreadList=[]
 
-        interval=self.slider.sliderPosition()*500
+        interval=self.slider.sliderPosition()
 
         for ip in cdnList:
             thread=SearchThread(self.from_station,self.to_station,self.train_date,interval,ip)
@@ -156,17 +202,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.searchThreadList.append(thread)
 
     def search_thread_stop(self):
-        for thread in self.searchThreadList:
-            thread.stop()
+        try:
+            for thread in self.searchThreadList:
+                thread.stop()
+        except:
+            pass
 
     def search_thread_callback(self,data):
 
         ticketList=self.get_need_seat(data)
 
+        if self.buying ==True:
+            return
+
         if len(ticketList)>0 :
             self.show_message('发现有票，开始购买，如错误请重新点开始')
+            self.buying=True
             self.searchBtn.setChecked(False)
-            self.search(False)
+            for thread in self.searchThreadList :
+                thread.stop()
+
             for ticket in ticketList:
                 self.buyTicket(ticket)
         else:

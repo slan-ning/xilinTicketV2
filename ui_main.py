@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'F:\project\python\xilin_ticket\main.ui'
 #
-# Created: Mon Sep 15 11:25:16 2014
+# Created: Mon Sep 15 14:36:53 2014
 #      by: PyQt5 UI code generator 5.3.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -114,7 +114,7 @@ class Ui_MainWindow(object):
         self.passager_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.passager_table.setGridStyle(QtCore.Qt.DashLine)
         self.passager_table.setObjectName("passager_table")
-        self.passager_table.setColumnCount(4)
+        self.passager_table.setColumnCount(5)
         self.passager_table.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
         font = QtGui.QFont()
@@ -130,6 +130,8 @@ class Ui_MainWindow(object):
         self.passager_table.setHorizontalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
         self.passager_table.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.passager_table.setHorizontalHeaderItem(4, item)
         self.passager_table.horizontalHeader().setVisible(True)
         self.passager_table.horizontalHeader().setDefaultSectionSize(82)
         self.passager_table.horizontalHeader().setHighlightSections(False)
@@ -234,6 +236,8 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "手机"))
         item = self.passager_table.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "身份证"))
+        item = self.passager_table.horizontalHeaderItem(4)
+        item.setText(_translate("MainWindow", "票类型"))
         self.cb_first_seat.setText(_translate("MainWindow", "一等座"))
         self.cb_second_seat.setText(_translate("MainWindow", "二等座"))
         self.cb_soft_bed.setText(_translate("MainWindow", "软卧"))

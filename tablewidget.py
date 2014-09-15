@@ -27,6 +27,7 @@ class TableWidget(QTableWidget):
         self.setColumnWidth(1, 60)
         self.setColumnWidth(2, 84)
         self.setColumnWidth(3, 154)
+        self.setColumnWidth(4, 60)
 
         # 创建QMenu
         self.contextMenu = QtWidgets.QMenu(self)
@@ -54,7 +55,10 @@ class TableWidget(QTableWidget):
         check_item=QtWidgets.QTableWidgetItem('')
         check_item.setCheckState(QtCore.Qt.Checked)
 
+        ticketTypeItem=QtWidgets.QTableWidgetItem('成人票')
+
         self.setItem(insert_row,0,check_item)
+        self.setItem(insert_row,4,ticketTypeItem)
 
     def action_del(self):
         select_list=self.selectedItems()
@@ -67,7 +71,19 @@ class TableWidget(QTableWidget):
 
         for i in range(itemCount):
             if self.item(i,0).checkState() ==QtCore.Qt.Checked:
-                passenger={'name':self.item(i,1).text(),'telephone':self.item(i,2).text(),'idcard':self.item(i,3).text()}
+                ticketTypeStr=self.item(i,4).text()
+
+                if '儿童' in ticketTypeStr :
+                    ticketType='2'
+                elif '学生' in ticketTypeStr:
+                    ticketType='3'
+                elif '军残' in ticketTypeStr:
+                    ticketType='4'
+                else:
+                    ticketType='1'
+
+                passenger={'name':self.item(i,1).text(),'ticketType':ticketType,\
+                           'telephone':self.item(i,2).text(),'idcard':self.item(i,3).text()}
                 passengerList.append(passenger)
 
         return passengerList
@@ -85,6 +101,7 @@ class TableWidget(QTableWidget):
                 passengerConfig['passenger']['name'+str(i)]=self.item(i,1).text()
                 passengerConfig['passenger']['telephone'+str(i)]=self.item(i,2).text()
                 passengerConfig['passenger']['idcard'+str(i)]=self.item(i,3).text()
+                passengerConfig['passenger']['ticketType'+str(i)]=self.item(i,4).text()
                 passengerConfig['passenger']['check'+str(i)]=True if self.item(i,0).checkState()==QtCore.Qt.Checked else False
 
         config.read_dict(passengerConfig)
@@ -105,6 +122,7 @@ class TableWidget(QTableWidget):
             name=config.get('passenger','name'+str(i))
             telephone=config.get('passenger','telephone'+str(i))
             idcard=config.get('passenger','idcard'+str(i))
+            ticketType=config.get('passenger','ticketType'+str(i))
 
             check_item=QtWidgets.QTableWidgetItem('')
             check_item.setCheckState(QtCore.Qt.Checked if check else QtCore.Qt.Unchecked)
@@ -112,11 +130,13 @@ class TableWidget(QTableWidget):
             name_item=QtWidgets.QTableWidgetItem(name)
             telephone_item=QtWidgets.QTableWidgetItem(telephone)
             idcard_item=QtWidgets.QTableWidgetItem(idcard)
+            ticket_type_item=QtWidgets.QTableWidgetItem(ticketType)
 
             self.setItem(i,0,check_item)
             self.setItem(i,1,name_item)
             self.setItem(i,2,telephone_item)
             self.setItem(i,3,idcard_item)
+            self.setItem(i,4,ticket_type_item)
 
 
 

@@ -8,7 +8,7 @@ import urllib.parse
 class C12306:
     username = ''
     password = ''
-    domain = '59.63.173.166' #请求域名（真实连接地址）
+    domain = 'kyfw.12306.cn' #请求域名（真实连接地址）
     host='kyfw.12306.cn' #请求的域名（host）
     http = requests.session()
     stationCode = {}
@@ -137,10 +137,10 @@ class C12306:
         ticketInfo=[]
         oldPassengerInfo=[]
         for passenger in passengerList:
-            ticketStr=Ticket.seat_type+",0,1,"+passenger['name']+',1,'+passenger['idcard']+','+\
+            ticketStr=Ticket.seat_type+",0,"+passenger['ticketType']+","+passenger['name']+',1,'+passenger['idcard']+','+\
                       passenger['telephone']+',N'
             ticketInfo.append(ticketStr)
-            oldPStr=passenger['name']+',1,'+passenger['idcard']+',1'
+            oldPStr=passenger['name']+',1,'+passenger['idcard']+','+passenger['ticketType']
             oldPassengerInfo.append(oldPStr)
         ticketStrs=urllib.parse.quote_plus('_'.join(ticketInfo))
         oldPassengerStrs=urllib.parse.quote_plus('_'.join(oldPassengerInfo))
