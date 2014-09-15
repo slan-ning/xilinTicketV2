@@ -228,6 +228,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             for ticket in ticketList:
                 self.buyTicket(ticket)
+            self.search(False)
         else:
             self.show_message('没有合适的票')
 
