@@ -1,15 +1,17 @@
 __author__ = 'Administrator'
-from PyQt5.QtCore import (QThread,pyqtSignal)
+from PyQt5.QtCore import (QThread,pyqtSignal,QSemaphore)
 import requests
 import xlstr
 import time
 
+mutex=QSemaphore(5)
 
 class SearchThread(QThread):
     domain = 'kyfw.12306.cn' #请求域名（真实连接地址）
     host='kyfw.12306.cn' #请求的域名（host）
     http = requests.session()
     stopSignal=False
+
 
     searchThreadCallback= pyqtSignal(list)
 
@@ -28,13 +30,16 @@ class SearchThread(QThread):
         if not self.load_station_code():
             print('加载车站码异常')
 
-        while not self.stopSignal:
-            ret=self.search_ticket(self.from_station,self.to_station,self.train_date)
 
+        while not self.stopSignal:
+            mutex.acquire(1)
+            ret=self.search_ticket(self.from_station,self.to_station,self.train_date)
             if ret!=False:
                 self.searchThreadCallback.emit(ret)
-
+                pass
+            mutex.release(1)
             time.sleep(self.interval)
+
 
 
     def search_ticket(self, fromStation, toStation, date):
@@ -46,7 +51,7 @@ class SearchThread(QThread):
             self.stationCode[toStation]+"&purpose_codes=ADULT"
 
         try:
-            res = self.http.get(url,verify=False,headers=headers)
+            res = self.http.get(url,verify=False,headers=headers,timeout=2)
             ticketInfo=res.json()
             if ticketInfo['status']!=True or ticketInfo['messages']!=[] :
                 return False
