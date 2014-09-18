@@ -3,6 +3,8 @@ from PyQt5.QtCore import (QThread,pyqtSignal,QSemaphore)
 import requests
 import xlstr
 import time
+import urllib.request
+import json
 
 mutex=QSemaphore(5)
 
@@ -44,15 +46,26 @@ class SearchThread(QThread):
 
     def search_ticket(self, fromStation, toStation, date):
 
-        headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init',"host":self.host}
+        userAgent="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36"
+        headers={'Referer':'',"host":self.host\
+            ,'Cache-Control':'no-cache','Pragma':"no-cache","User-Agent":userAgent}
 
         url='https://' + self.domain + '/otn/leftTicket/queryT?leftTicketDTO.train_date='+date\
             +"&leftTicketDTO.from_station="+self.stationCode[fromStation]+"&leftTicketDTO.to_station="+\
             self.stationCode[toStation]+"&purpose_codes=ADULT"
 
         try:
-            res = self.http.get(url,verify=False,headers=headers,timeout=2)
-            ticketInfo=res.json()
+            #res = self.http.get(url,verify=False,headers=headers,timeout=2)
+            req=urllib.request.Request(url)
+            req.add_header("Referer","https://kyfw.12306.cn/otn/leftTicket/init")
+            req.add_header("host",self.host)
+            req.add_header("Cache-Control","no-cache")
+            req.add_header("Pragma","no-cache")
+            req.add_header("User-Agent",userAgent)
+            r=urllib.request.urlopen(req)
+            ret=r.read().decode()
+
+            ticketInfo=json.loads(ret)
             if ticketInfo['status']!=True or ticketInfo['messages']!=[] :
                 return False
 
@@ -60,7 +73,8 @@ class SearchThread(QThread):
                 return False
 
             return ticketInfo['data']
-        except:
+        except Exception as e:
+            print("ip:"+self.domain+"查询发生错误："+e.__str__())
             return False
 
     def load_station_code(self):
