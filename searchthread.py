@@ -13,15 +13,17 @@ class SearchThread(QThread):
     host='kyfw.12306.cn' #请求的域名（host）
     http = requests.session()
     stopSignal=False
+    threadId=1
 
 
     searchThreadCallback= pyqtSignal(list)
 
-    def __init__(self,from_station,to_station,train_date,interval=2,domain=''):
+    def __init__(self,from_station,to_station,train_date,threadId,interval=2,domain=''):
         super(SearchThread,self).__init__()
         if domain!='':
             self.domain=domain
 
+        self.threadId=threadId
         self.from_station=from_station
         self.to_station=to_station
         self.train_date=train_date
@@ -29,9 +31,10 @@ class SearchThread(QThread):
 
 
     def run(self):
+        time.sleep(self.threadId)
+        print(self.threadId)
         if not self.load_station_code():
             print('加载车站码异常')
-
 
         while not self.stopSignal:
             mutex.acquire(1)
@@ -84,7 +87,7 @@ class SearchThread(QThread):
         :raise C12306Error:
         """
         header={"host":self.host}
-        res = requests.get('https://'+self.domain+'/otn/resources/js/framework/station_name.js', verify=False,headers=header)
+        res = self.http.get('https://kyfw.12306.cn/otn/resources/js/framework/station_name.js', verify=False,headers=header)
         if res.status_code != 200:
             return False
 

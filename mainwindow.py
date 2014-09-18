@@ -196,9 +196,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.searchThreadList=[]
 
         interval=self.slider.sliderPosition()/2
+        i=0
 
         for ip in cdnList:
-            thread=SearchThread(self.from_station,self.to_station,self.train_date,interval,ip)
+            i+=1
+            thread=SearchThread(self.from_station,self.to_station,self.train_date,i,interval,ip)
             thread.searchThreadCallback.connect(self.search_thread_callback)
             thread.start()
             self.searchThreadList.append(thread)
@@ -305,6 +307,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.memo.ensureCursorVisible()
         self.memo.append(time.strftime("%m-%d %H:%M:%S ", time.localtime()) +msg)
         self.memo.moveCursor(QTextCursor.End)
+
+    def clear_message(self):
+        print("清空!")
+        self.memo.clear()
 
     def open_12306_site(self):
         webbrowser.open("https://kyfw.12306.cn/otn/queryOrder/initNoComplete")
