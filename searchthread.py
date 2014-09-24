@@ -1,5 +1,5 @@
 __author__ = 'Administrator'
-from PyQt5.QtCore import (QThread,pyqtSignal,QSemaphore,QUrl)
+from PyQt5.QtCore import (QThread,pyqtSignal,QSemaphore,QUrl,QEventLoop,QObject)
 from PyQt5.QtNetwork import (QNetworkAccessManager,QNetworkRequest,QNetworkReply)
 import requests
 import xlstr
@@ -29,20 +29,19 @@ class SearchThread(QThread):
         self.to_station=to_station
         self.train_date=train_date
         self.interval=interval
-        self.netWorkManager=QNetworkAccessManager()
+
 
 
     def run(self):
         time.sleep(self.threadId)
+        self.netWorkManager=QNetworkAccessManager()
         if not self.load_station_code():
             print('加载车站码异常')
 
         while not self.stopSignal:
             mutex.acquire(1)
             ret=self.search_ticket(self.from_station,self.to_station,self.train_date)
-            if ret!=False:
-                self.searchThreadCallback.emit(ret)
-                pass
+
             mutex.release(1)
             time.sleep(self.interval)
 
@@ -54,13 +53,13 @@ class SearchThread(QThread):
         headers={'Referer':'',"host":self.host\
             ,'Cache-Control':'no-cache','Pragma':"no-cache","User-Agent":userAgent}
 
-        url='http://' + self.domain + '/otn/leftTicket/queryT?leftTicketDTO.train_date='+date\
+        url='https://' + self.domain + '/otn/leftTicket/query?leftTicketDTO.train_date='+date\
             +"&leftTicketDTO.from_station="+self.stationCode[fromStation]+"&leftTicketDTO.to_station="+\
             self.stationCode[toStation]+"&purpose_codes=ADULT"
 
         req=QNetworkRequest()
         req.setUrl(QUrl(url))
-        req.setRawHeader("Referer","http://kyfw.12306.cn/otn/leftTicket/init")
+        req.setRawHeader("Referer","https://kyfw.12306.cn/otn/leftTicket/init")
         req.setRawHeader("host",self.host)
         req.setRawHeader("Cache-Control","no-cache")
         req.setRawHeader("Pragma","no-cache")
@@ -74,25 +73,28 @@ class SearchThread(QThread):
             # req.add_header("Cache-Control","no-cache")
             # req.add_header("Pragma","no-cache")
             # req.add_header("User-Agent",userAgent)
-            r=self.netWorkManager.get(req)
-            ret=r.readAll()
+            loop=QEventLoop()
+            self.reply=self.netWorkManager.get(req)
+            self.reply.ignoreSslErrors()
+            self.reply.finished.connect(self.search_finished,loop)
+            #QObject.connect(self.reply,SIGNAL("finished()"),loop,SOLT(self.search_finished()))
+            loop.exec()
 
-            print(ret)
-
-            ticketInfo=json.loads(ret)
-            if ticketInfo['status']!=True or ticketInfo['messages']!=[] :
-                return False
-
-            if len(ticketInfo['data'])<=0:
-                return False
-
-            return ticketInfo['data']
         except Exception as e:
             print("ip:"+self.domain+"查询发生错误："+e.__str__())
             return False
 
-    def search_finished(self,response):
-        pass
+    def search_finished(self):
+        ret=self.reply.readAll()
+        ret=str(ret,'utf8')
+        ticketInfo=json.loads(ret)
+        if ticketInfo['status']!=True or ticketInfo['messages']!=[] :
+            return False
+
+        if len(ticketInfo['data'])<=0:
+            return False
+
+        self.searchThreadCallback.emit(ticketInfo['data'])
 
     def load_station_code(self):
         """Load station telcode from 12306.cn
