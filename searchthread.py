@@ -37,6 +37,22 @@ class SearchThread(QThread):
         if not self.load_station_code():
             print('加载车站码异常')
 
+        userAgent="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36"
+        headers={'Referer':'',"host":self.host\
+            ,'Cache-Control':'no-cache','Pragma':"no-cache","User-Agent":userAgent}
+
+        url='https://' + self.domain + '/otn/leftTicket/query?leftTicketDTO.train_date='+self.train_date\
+            +"&leftTicketDTO.from_station="+self.stationCode[self.from_station]+"&leftTicketDTO.to_station="+\
+            self.stationCode[self.to_station]+"&purpose_codes=ADULT"
+
+        self.req=QNetworkRequest()
+        self.req.setUrl(QUrl(url))
+        self.req.setRawHeader("Referer","https://kyfw.12306.cn/otn/leftTicket/init")
+        self.req.setRawHeader("host",self.host)
+        self.req.setRawHeader("Cache-Control","no-cache")
+        self.req.setRawHeader("Pragma","no-cache")
+        self.req.setRawHeader("User-Agent",userAgent)
+
         while not self.stopSignal:
             mutex.acquire(1)
             self.search_ticket(self.from_station,self.to_station,self.train_date)
@@ -45,25 +61,8 @@ class SearchThread(QThread):
 
 
     def search_ticket(self, fromStation, toStation, date):
-
-        userAgent="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36"
-        headers={'Referer':'',"host":self.host\
-            ,'Cache-Control':'no-cache','Pragma':"no-cache","User-Agent":userAgent}
-
-        url='https://' + self.domain + '/otn/leftTicket/query?leftTicketDTO.train_date='+date\
-            +"&leftTicketDTO.from_station="+self.stationCode[fromStation]+"&leftTicketDTO.to_station="+\
-            self.stationCode[toStation]+"&purpose_codes=ADULT"
-
-        req=QNetworkRequest()
-        req.setUrl(QUrl(url))
-        req.setRawHeader("Referer","https://kyfw.12306.cn/otn/leftTicket/init")
-        req.setRawHeader("host",self.host)
-        req.setRawHeader("Cache-Control","no-cache")
-        req.setRawHeader("Pragma","no-cache")
-        req.setRawHeader("User-Agent",userAgent)
-
         try:
-            self.reply=self.netWorkManager.get(req)
+            self.reply=self.netWorkManager.get(self.req)
             self.reply.ignoreSslErrors()
             self.reply.finished.connect(self.search_finished)
             self.exec()
@@ -76,6 +75,7 @@ class SearchThread(QThread):
         ret=self.reply.readAll()
         ret=str(ret,'utf8')
         ticketInfo=json.loads(ret)
+        self.reply=None
         self.exit()
         if ticketInfo['status']!=True or ticketInfo['messages']!=[] :
             return False
@@ -83,7 +83,11 @@ class SearchThread(QThread):
         if len(ticketInfo['data'])<=0:
             return False
 
-        self.searchThreadCallback.emit(ticketInfo['data'])
+        data=ticketInfo['data']
+        ret=None
+        ticketInfo=None
+
+        self.searchThreadCallback.emit(data)
 
     def load_station_code(self):
         """Load station telcode from 12306.cn

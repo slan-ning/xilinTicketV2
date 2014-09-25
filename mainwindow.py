@@ -114,6 +114,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.search_thread_start()
                 self.keep_online_timer=QTimer()
                 self.keep_online_timer.timeout.connect(self._my12306.keep_online)
+                self.keep_online_timer.timeout.connect(self.clear_message)
                 self.keep_online_timer.start(5*60*1000)
             else:
                 #定时执行
