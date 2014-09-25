@@ -31,7 +31,6 @@ class SearchThread(QThread):
         self.interval=interval
 
 
-
     def run(self):
         time.sleep(self.threadId)
         self.netWorkManager=QNetworkAccessManager()
@@ -40,11 +39,9 @@ class SearchThread(QThread):
 
         while not self.stopSignal:
             mutex.acquire(1)
-            ret=self.search_ticket(self.from_station,self.to_station,self.train_date)
-
+            self.search_ticket(self.from_station,self.to_station,self.train_date)
             mutex.release(1)
             time.sleep(self.interval)
-
 
 
     def search_ticket(self, fromStation, toStation, date):
@@ -66,19 +63,10 @@ class SearchThread(QThread):
         req.setRawHeader("User-Agent",userAgent)
 
         try:
-            #res = self.http.get(url,verify=False,headers=headers,timeout=2)
-            # req=urllib.request.Request(url)
-            # req.add_header("Referer","https://kyfw.12306.cn/otn/leftTicket/init")
-            # req.add_header("host",self.host)
-            # req.add_header("Cache-Control","no-cache")
-            # req.add_header("Pragma","no-cache")
-            # req.add_header("User-Agent",userAgent)
-            loop=QEventLoop()
             self.reply=self.netWorkManager.get(req)
             self.reply.ignoreSslErrors()
-            self.reply.finished.connect(self.search_finished,loop)
-            #QObject.connect(self.reply,SIGNAL("finished()"),loop,SOLT(self.search_finished()))
-            loop.exec()
+            self.reply.finished.connect(self.search_finished)
+            self.exec()
 
         except Exception as e:
             print("ip:"+self.domain+"查询发生错误："+e.__str__())
@@ -88,6 +76,7 @@ class SearchThread(QThread):
         ret=self.reply.readAll()
         ret=str(ret,'utf8')
         ticketInfo=json.loads(ret)
+        self.exit()
         if ticketInfo['status']!=True or ticketInfo['messages']!=[] :
             return False
 
