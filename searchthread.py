@@ -1,13 +1,12 @@
 __author__ = 'Administrator'
-from PyQt5.QtCore import (QThread,pyqtSignal,QSemaphore,QUrl,QEventLoop,QObject)
-from PyQt5.QtNetwork import (QNetworkAccessManager,QNetworkRequest,QNetworkReply)
+from PyQt5.QtCore import (QThread,pyqtSignal,QSemaphore,QUrl)
+from PyQt5.QtNetwork import (QNetworkAccessManager,QNetworkRequest)
 import requests
 import xlstr
 import time
-import urllib.request
 import json
 
-mutex=QSemaphore(5)
+mutex=QSemaphore(20)
 
 class SearchThread(QThread):
     domain = 'kyfw.12306.cn' #请求域名（真实连接地址）
@@ -33,7 +32,7 @@ class SearchThread(QThread):
 
     def run(self):
         time.sleep(self.threadId)
-        self.netWorkManager=QNetworkAccessManager()
+
         if not self.load_station_code():
             print('加载车站码异常')
 
@@ -62,6 +61,7 @@ class SearchThread(QThread):
 
     def search_ticket(self, fromStation, toStation, date):
         try:
+            self.netWorkManager=QNetworkAccessManager()
             self.reply=self.netWorkManager.get(self.req)
             self.reply.ignoreSslErrors()
             self.reply.finished.connect(self.search_finished)
@@ -72,22 +72,26 @@ class SearchThread(QThread):
             return False
 
     def search_finished(self):
-        ret=self.reply.readAll()
-        ret=str(ret,'utf8')
-        ticketInfo=json.loads(ret)
-        self.reply=None
-        self.exit()
-        if ticketInfo['status']!=True or ticketInfo['messages']!=[] :
-            return False
+        try:
+            ret=self.reply.readAll()
+            ret=str(ret,'utf8')
+            ticketInfo=json.loads(ret)
+            self.reply=None
+            self.netWorkManager=None
+            self.exit()
+            if ticketInfo['status']!=True or ticketInfo['messages']!=[] :
+                return False
 
-        if len(ticketInfo['data'])<=0:
-            return False
+            if len(ticketInfo['data'])<=0:
+                return False
 
-        data=ticketInfo['data']
-        ret=None
-        ticketInfo=None
+            data=ticketInfo['data']
+            ret=None
+            ticketInfo=None
 
-        self.searchThreadCallback.emit(data)
+            self.searchThreadCallback.emit(data)
+        except Exception as e:
+            print(e.__str__())
 
     def load_station_code(self):
         """Load station telcode from 12306.cn
