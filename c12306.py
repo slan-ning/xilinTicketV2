@@ -22,10 +22,10 @@ class C12306:
         res = self.http.get('https://'+self.domain+'/otn/login/init', verify=False,headers=headers)
         assert isinstance(res, requests.Response)
 
-        if not '/otn/dynamicJs/loginJs' in res.text:
+        if not '/otn/resources/merged/login_js.js' in res.text:
             raise C12306Error('初始化页面错误')
 
-        dynamic_js_url = xlstr.substr(res.text, "/otn/dynamicJs/loginJs", "\"");
+        dynamic_js_url = xlstr.substr(res.text, "/otn/resources/merged/login_js.js", "\"");
         dynamic_js = self.http.get("https://"+self.domain + dynamic_js_url, verify=False,headers=headers)
         self.load_station_code()
 
@@ -82,7 +82,7 @@ class C12306:
 
         headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init',"host":self.host}
 
-        url='https://' + self.domain + '/otn/leftTicket/queryT?leftTicketDTO.train_date='+date\
+        url='https://' + self.domain + '/otn/leftTicket/query?leftTicketDTO.train_date='+date\
             +"&leftTicketDTO.from_station="+self.stationCode[fromStation]+"&leftTicketDTO.to_station="+\
             self.stationCode[toStation]+"&purpose_codes=ADULT"
 
