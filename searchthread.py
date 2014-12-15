@@ -40,7 +40,7 @@ class SearchThread(QThread):
         headers={'Referer':'',"host":self.host\
             ,'Cache-Control':'no-cache','Pragma':"no-cache","User-Agent":userAgent}
 
-        url='https://' + self.domain + '/otn/leftTicket/query?leftTicketDTO.train_date='+self.train_date\
+        url='https://' + self.domain + '/otn/leftTicket/queryT?leftTicketDTO.train_date='+self.train_date\
             +"&leftTicketDTO.from_station="+self.stationCode[self.from_station]+"&leftTicketDTO.to_station="+\
             self.stationCode[self.to_station]+"&purpose_codes=ADULT"
 
