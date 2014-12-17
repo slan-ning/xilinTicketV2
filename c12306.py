@@ -36,6 +36,8 @@ class C12306:
         self.loginDynamicKey=xlstr.substr(ret,"gc(){var key='","'")
         self.loginDynamicVal=urllib.parse.quote_plus(xxtea.encrypt("1111",self.loginDynamicKey))
 
+
+
         self.load_station_code()
 
     def load_station_code(self):
@@ -194,9 +196,12 @@ class C12306:
              +"&oldPassengerStr="+oldPassengerStrs+"&tour_flag=dc&randCode="+randCode+"&"+self.dynamicKey+"="+self.dynamicVal+\
              "&_json_att=&REPEAT_SUBMIT_TOKEN="+self.Token
 
+        headers={'Referer':'https://kyfw.12306.cn/otn/confirmPassenger/initDc','X-Requested-With':'XMLHttpRequest'\
+            ,'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',"host":self.host}
+
         pstr=pstr.encode()
 
-        res=self.http.post('https://'+self.domain+'/otn/confirmPassenger/checkOrderInfo',pstr,headers={"host":self.host})
+        res=self.http.post('https://'+self.domain+'/otn/confirmPassenger/checkOrderInfo',pstr,headers=headers)
 
         orderInfo=res.json()
         if orderInfo['status']!=True:
@@ -212,7 +217,7 @@ class C12306:
                  Ticket.yp_info+"&purpose_codes=00&_json_att=&REPEAT_SUBMIT_TOKEN="+self.Token
 
             pstr=pstr.encode()
-            res=self.http.post('https://'+self.domain+'/otn/confirmPassenger/getQueueCount',pstr,headers={"host":self.host}).json()
+            res=self.http.post('https://'+self.domain+'/otn/confirmPassenger/getQueueCount',pstr,headers=headers).json()
 
             if res['status']!=True:
                 raise C12306Error('查询排队队列错误:'+''.join(res['messages']))
@@ -231,7 +236,10 @@ class C12306:
              "&train_location="+self.trainLocation+"&_json_att=&REPEAT_SUBMIT_TOKEN="+self.Token
         pstr=pstr.encode()
 
-        res=self.http.post("https://"+self.domain+"/otn/confirmPassenger/confirmSingleForQueue",pstr,headers={"host":self.host}).json()
+        headers={'Referer':'https://kyfw.12306.cn/otn/confirmPassenger/initDc','X-Requested-With':'XMLHttpRequest'\
+            ,'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',"host":self.host}
+
+        res=self.http.post("https://"+self.domain+"/otn/confirmPassenger/confirmSingleForQueue",pstr,headers=headers).json()
 
         if res['status']==True :
             return True
@@ -242,6 +250,8 @@ class C12306:
 
     def keep_online(self):
         print("keep online")
+        headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init','X-Requested-With':'XMLHttpRequest'\
+            ,'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',"host":self.host}
         self.http.get("https://"+self.domain+"/otn/queryOrder/initNoComplete",headers={"host":self.host})
 
 

@@ -2,7 +2,7 @@ __author__ = 'Administrator'
 from PyQt5.QtCore import (QThread,pyqtSignal,QSemaphore,QUrl)
 from PyQt5.QtNetwork import (QNetworkAccessManager,QNetworkRequest)
 import requests
-import xlstr
+import xxtea
 import time
 import json
 import random
@@ -16,7 +16,7 @@ class SearchThread(QThread):
     stopSignal=False
     threadId=1
     leftTicketUrl="leftTicket/query"
-
+    requests.packages.urllib3.disable_warnings()
 
     searchThreadCallback= pyqtSignal(list)
 
@@ -36,19 +36,39 @@ class SearchThread(QThread):
     def run(self):
         time.sleep(self.threadId)
 
-        if not self.load_station_code():
-            print('加载车站码异常')
-
         userAgent="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36"
-        headers={'Referer':'',"host":self.host\
+        headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init',"host":self.host\
             ,'Cache-Control':'no-cache','Pragma':"no-cache","User-Agent":userAgent,"X-Requested-With":"XMLHttpRequest"}
 
         t=str(random.random())
 
-        url='https://' + self.domain + '/otn/'+self.leftTicketUrl+'?leftTicketDTO.train_date='+self.train_date\
+        dataUrl='?leftTicketDTO.train_date='+self.train_date\
             +"&leftTicketDTO.from_station="+self.stationCode[self.from_station]+"&leftTicketDTO.to_station="+\
-            self.stationCode[self.to_station]+"&purpose_codes=ADULT&t="+t
+            self.stationCode[self.to_station]+"&purpose_codes=ADULT"
 
+        logUrl='https://' + self.domain + '/otn/leftTicket/log'+dataUrl
+        url='https://' + self.domain + '/otn/'+self.leftTicketUrl+dataUrl
+
+
+        self.http.get(logUrl,verify=False,headers=headers)
+        jc_fromStation=xxtea.unicodeStr(self.from_station+","+self.stationCode[self.from_station])
+        jc_toStation=xxtea.unicodeStr(self.to_station+","+self.stationCode[self.to_station])
+        self.http.cookies.set("_jc_save_fromStation",jc_fromStation)
+        self.http.cookies.set("_jc_save_toStation",jc_toStation)
+        self.http.cookies.set('_jc_save_fromDate',self.train_date)
+        self.http.cookies.set('_jc_save_toDate',"2014-01-01")
+        self.http.cookies.set('_jc_save_wfdc_flag','dc')
+
+        ret=self.http.get(url,verify=False,headers=headers)
+        ticketInfo=ret.json()
+
+        if ticketInfo['status']!=True :
+            print(ticketInfo)
+
+        cookies=self.http.cookies.get_dict()
+        cookieStr=";".join('%s=%s' % (key, value) for (key, value) in cookies.items())
+
+        self.http.get(logUrl,verify=False,headers=headers)
         self.req=QNetworkRequest()
         self.req.setUrl(QUrl(url))
         self.req.setRawHeader("Referer","https://kyfw.12306.cn/otn/leftTicket/init")
@@ -56,6 +76,7 @@ class SearchThread(QThread):
         self.req.setRawHeader("Cache-Control","no-cache")
         self.req.setRawHeader("Pragma","no-cache")
         self.req.setRawHeader("User-Agent",userAgent)
+        self.req.setRawHeader("Cookie",cookieStr)
 
         while not self.stopSignal:
             mutex.acquire(1)
@@ -76,6 +97,8 @@ class SearchThread(QThread):
             print("ip:"+self.domain+"查询发生错误："+e.__str__())
             return False
 
+
+
     def search_finished(self):
         try:
             ret=self.reply.readAll()
@@ -85,6 +108,8 @@ class SearchThread(QThread):
             self.netWorkManager=None
             self.exit()
             if ticketInfo['status']!=True or ticketInfo['messages']!=[] :
+                print(self.domain)
+                print(ticketInfo)
                 return False
 
             if len(ticketInfo['data'])<=0:
@@ -98,27 +123,8 @@ class SearchThread(QThread):
         except Exception as e:
             print(e.__str__())
 
-    def load_station_code(self):
-        """Load station telcode from 12306.cn
-
-        加载车站电报码，各个请求中会用到
-        :raise C12306Error:
-        """
-        header={"host":self.host}
-        res = self.http.get('https://kyfw.12306.cn/otn/resources/js/framework/station_name.js', verify=False,headers=header)
-        if res.status_code != 200:
-            return False
-
-        stationStrs = xlstr.substr(res.text, "'", "'")
-        stationList = stationStrs.split('@')
-        stationDict = {}
-
-        for stationStr in stationList:
-            station = stationStr.split("|")
-            if len(station) > 3:
-                stationDict[station[1]] = station[2]
-
-        self.stationCode = stationDict
+    def load_station_code(self,stationCode):
+        self.stationCode = stationCode
         return True
 
     def stop(self):

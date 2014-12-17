@@ -200,6 +200,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for ip in cdnList:
             i+=1
             thread=SearchThread(self.from_station,self.to_station,self.train_date,i,self._my12306.leftTicketUrl,interval,ip)
+            thread.load_station_code(self._my12306.stationCode)
             thread.searchThreadCallback.connect(self.search_thread_callback)
             thread.start()
             self.searchThreadList.append(thread)
