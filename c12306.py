@@ -1,12 +1,11 @@
 __author__ = 'Administrator'
 import requests
 import xlstr
-import json
 import urllib.parse
 import urllib
 import xxtea
-import base64
-import binascii
+import random
+
 
 
 class C12306:
@@ -86,9 +85,10 @@ class C12306:
 
         headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init',"host":self.host}
 
+        t=str(random.random())
         url='https://' + self.domain + '/otn/leftTicket/queryT?leftTicketDTO.train_date='+date\
             +"&leftTicketDTO.from_station="+self.stationCode[fromStation]+"&leftTicketDTO.to_station="+\
-            self.stationCode[toStation]+"&purpose_codes=ADULT"
+            self.stationCode[toStation]+"&purpose_codes=ADULT&t="+t
 
         res = self.http.get(url,verify=False,headers=headers)
         ticketInfo=res.json()
