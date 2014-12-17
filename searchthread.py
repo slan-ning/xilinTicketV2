@@ -43,7 +43,7 @@ class SearchThread(QThread):
 
         t=str(random.random())
 
-        url='https://' + self.domain + '/otn/leftTicket/queryT?leftTicketDTO.train_date='+self.train_date\
+        url='https://' + self.domain + '/otn/leftTicket/query?leftTicketDTO.train_date='+self.train_date\
             +"&leftTicketDTO.from_station="+self.stationCode[self.from_station]+"&leftTicketDTO.to_station="+\
             self.stationCode[self.to_station]+"&purpose_codes=ADULT&t="+t
 
