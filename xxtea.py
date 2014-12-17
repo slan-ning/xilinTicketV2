@@ -108,9 +108,17 @@ def encode32(inputbuf):
 
     return output
 
+def bin216(s):
+    b=""
+    for x in s:
+        char=hex(ord(x))[2:]
+        if len(char)<2:
+            char="0"+char
+        b+=char
+    return b
+
 
 def encrypt(text, key):
     b = Base32encrypt(text, key)
-    print(':'.join(hex(ord(x))[2:] for x in b))
-    data = encode32(binascii.a2b_hex(b))
+    data = encode32(bin216(b))
     return data

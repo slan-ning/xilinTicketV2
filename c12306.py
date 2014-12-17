@@ -21,9 +21,6 @@ class C12306:
         if domain!='':
             self.domain=domain
 
-        print((xxtea.encrypt("1111","MzAwNjYz")))
-        exit()
-
         headers={"host":self.host}
         self.http.get("https://" + self.domain + "/otn/", verify=False,headers=headers)
         res = self.http.get('https://'+self.domain+'/otn/login/init', verify=False,headers=headers)
@@ -135,7 +132,7 @@ class C12306:
         dynamic_js = self.http.get("https://"+self.domain +"/otn/dynamicJs/"+ dynamic_js_url, verify=False,headers=headers)
 
         self.dynamicKey=xlstr.substr(dynamic_js.text,"gc(){var key='","'")
-        self.dynamicVal=xxteax.encrypt("1111",self.dynamicKey).decode("utf-8")
+        self.dynamicVal=xxtea.encrypt("1111",self.dynamicKey)
         self.dynamicVal=urllib.parse.quote_plus(self.dynamicVal)
 
 
