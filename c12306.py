@@ -3,6 +3,10 @@ import requests
 import xlstr
 import json
 import urllib.parse
+import urllib
+import xxtea
+import base64
+import binascii
 
 
 class C12306:
@@ -17,16 +21,19 @@ class C12306:
         if domain!='':
             self.domain=domain
 
+        print((xxtea.encrypt("1111","MzAwNjYz")))
+        exit()
+
         headers={"host":self.host}
         self.http.get("https://" + self.domain + "/otn/", verify=False,headers=headers)
         res = self.http.get('https://'+self.domain+'/otn/login/init', verify=False,headers=headers)
         assert isinstance(res, requests.Response)
 
-        if not '/otn/resources/merged/login_js.js' in res.text:
+        if not 'src=\"/otn/dynamicJs/' in res.text:
             raise C12306Error('初始化页面错误')
 
-        dynamic_js_url = xlstr.substr(res.text, "/otn/resources/merged/login_js.js", "\"");
-        dynamic_js = self.http.get("https://"+self.domain + dynamic_js_url, verify=False,headers=headers)
+        dynamic_js_url = xlstr.substr(res.text, "src=\"/otn/dynamicJs/", "\"");
+        dynamic_js = self.http.get("https://"+self.domain+"/otn/dynamicJs/" + dynamic_js_url, verify=False,headers=headers)
         self.load_station_code()
 
     def load_station_code(self):
@@ -124,6 +131,14 @@ class C12306:
         self.leftTicketStr=xlstr.substr(pageText,"leftTicketStr':'","'")
         self.trainLocation=xlstr.substr(pageText,"train_location':'","'")
 
+        dynamic_js_url = xlstr.substr(res.text, "src=\"/otn/dynamicJs/", "\"");
+        dynamic_js = self.http.get("https://"+self.domain +"/otn/dynamicJs/"+ dynamic_js_url, verify=False,headers=headers)
+
+        self.dynamicKey=xlstr.substr(dynamic_js.text,"gc(){var key='","'")
+        self.dynamicVal=xxteax.encrypt("1111",self.dynamicKey).decode("utf-8")
+        self.dynamicVal=urllib.parse.quote_plus(self.dynamicVal)
+
+
         if  len(self.Token)!=32 :
             raise C12306Error('预定页面获取失败!')
 
@@ -146,7 +161,7 @@ class C12306:
         oldPassengerStrs=urllib.parse.quote_plus('_'.join(oldPassengerInfo))
 
         pstr="cancel_flag=2&bed_level_order_num=000000000000000000000000000000&passengerTicketStr="+ticketStrs\
-             +"&oldPassengerStr="+oldPassengerStrs+"&tour_flag=dc&randCode="+randCode+\
+             +"&oldPassengerStr="+oldPassengerStrs+"&tour_flag=dc&randCode="+randCode+"&"+self.dynamicKey+"="+self.dynamicVal+\
              "&_json_att=&REPEAT_SUBMIT_TOKEN="+self.Token
 
         pstr=pstr.encode()
