@@ -41,7 +41,7 @@ class SearchThread(QThread):
 
         userAgent="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36"
         headers={'Referer':'',"host":self.host\
-            ,'Cache-Control':'no-cache','Pragma':"no-cache","User-Agent":userAgent}
+            ,'Cache-Control':'no-cache','Pragma':"no-cache","User-Agent":userAgent,"X-Requested-With":"XMLHttpRequest"}
 
         t=str(random.random())
 

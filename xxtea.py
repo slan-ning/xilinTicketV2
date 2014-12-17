@@ -1,7 +1,6 @@
 __author__ = 'Administrator'
 import math
-import base64
-import binascii
+import urllib.parse
 
 
 def stringToLongArray(string, includeLength):
@@ -122,3 +121,9 @@ def encrypt(text, key):
     b = Base32encrypt(text, key)
     data = encode32(bin216(b))
     return data
+
+def unicodeStr(s):
+    v1=s.encode("unicode-escape").decode("utf8")
+    v2=urllib.parse.quote_plus(v1).upper()
+    v3=v2.replace("%5CU","%u")
+    return v3

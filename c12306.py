@@ -99,15 +99,29 @@ class C12306:
         self.searchDynamicKey=xlstr.substr(ret,"gc(){var key='","'")
         self.searchDynamicVal=urllib.parse.quote_plus(xxtea.encrypt("1111",self.searchDynamicKey))
 
+        self.auth_code_img('login')
+
     def search_ticket(self, fromStation, toStation, date):
 
-        headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init',"host":self.host}
+        headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init',"host":self.host\
+            ,"X-Requested-With":"XMLHttpRequest"}
+
+        jc_fromStation=xxtea.unicodeStr(fromStation+","+self.stationCode[fromStation])
+        jc_toStation=xxtea.unicodeStr(toStation+","+self.stationCode[toStation])
+        self.http.cookies.set("_jc_save_fromStation",jc_fromStation)
+        self.http.cookies.set("_jc_save_toStation",jc_toStation)
+        self.http.cookies.set('_jc_save_fromDate',date)
+        self.http.cookies.set('_jc_save_toDate',"2014-05-01")
+        self.http.cookies.set('_jc_save_wfdc_flag','dc')
 
         t=str(random.random())
-        url='https://' + self.domain + '/otn/'+self.leftTicketUrl+'?leftTicketDTO.train_date='+date\
+        dataUrl='?leftTicketDTO.train_date='+date\
             +"&leftTicketDTO.from_station="+self.stationCode[fromStation]+"&leftTicketDTO.to_station="+\
             self.stationCode[toStation]+"&purpose_codes=ADULT"
+        logUrl='https://' + self.domain + '/otn/leftTicket/log'+dataUrl
+        url='https://' + self.domain + '/otn/'+self.leftTicketUrl+dataUrl
 
+        self.http.get(logUrl,verify=False,headers=headers)
         res = self.http.get(url,verify=False,headers=headers)
         ticketInfo=res.json()
         if ticketInfo['status']!=True or ticketInfo['messages']!=[] :
