@@ -15,11 +15,12 @@ class SearchThread(QThread):
     http = requests.session()
     stopSignal=False
     threadId=1
+    leftTicketUrl="leftTicket/query"
 
 
     searchThreadCallback= pyqtSignal(list)
 
-    def __init__(self,from_station,to_station,train_date,threadId,interval=2,domain=''):
+    def __init__(self,from_station,to_station,train_date,threadId,leftTicketUrl,interval=2,domain=''):
         super(SearchThread,self).__init__()
         if domain!='':
             self.domain=domain
@@ -29,6 +30,7 @@ class SearchThread(QThread):
         self.to_station=to_station
         self.train_date=train_date
         self.interval=interval
+        self.leftTicketUrl=leftTicketUrl
 
 
     def run(self):
@@ -43,7 +45,7 @@ class SearchThread(QThread):
 
         t=str(random.random())
 
-        url='https://' + self.domain + '/otn/leftTicket/query?leftTicketDTO.train_date='+self.train_date\
+        url='https://' + self.domain + '/otn/'+self.leftTicketUrl+'?leftTicketDTO.train_date='+self.train_date\
             +"&leftTicketDTO.from_station="+self.stationCode[self.from_station]+"&leftTicketDTO.to_station="+\
             self.stationCode[self.to_station]+"&purpose_codes=ADULT&t="+t
 

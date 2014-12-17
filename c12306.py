@@ -14,6 +14,7 @@ class C12306:
     domain = 'kyfw.12306.cn' #请求域名（真实连接地址）
     host='kyfw.12306.cn' #请求的域名（host）
     http = requests.session()
+    leftTicketUrl="leftTicket/query"
     stationCode = {}
 
     def __init__(self,domain=''):
@@ -28,8 +29,13 @@ class C12306:
         if not 'src=\"/otn/dynamicJs/' in res.text:
             raise C12306Error('初始化页面错误')
 
-        dynamic_js_url = xlstr.substr(res.text, "src=\"/otn/dynamicJs/", "\"");
-        dynamic_js = self.http.get("https://"+self.domain+"/otn/dynamicJs/" + dynamic_js_url, verify=False,headers=headers)
+        dynamic_js_url = xlstr.substr(res.text, "src=\"/otn/dynamicJs/", "\"")
+        self.http.get("https://"+self.domain+"/otn/dynamicJs/" + dynamic_js_url, verify=False,headers=headers)
+
+        leftText=self.http.get("https://kyfw.12306.cn/otn/leftTicket/init",verify=False,headers=headers).text
+        self.leftTicketUrl=xlstr.substr(leftText,"var CLeftTicketUrl = '","'")
+
+
         self.load_station_code()
 
     def load_station_code(self):
@@ -86,7 +92,7 @@ class C12306:
         headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init',"host":self.host}
 
         t=str(random.random())
-        url='https://' + self.domain + '/otn/leftTicket/query?leftTicketDTO.train_date='+date\
+        url='https://' + self.domain + '/otn/'+self.leftTicketUrl+'?leftTicketDTO.train_date='+date\
             +"&leftTicketDTO.from_station="+self.stationCode[fromStation]+"&leftTicketDTO.to_station="+\
             self.stationCode[toStation]+"&purpose_codes=ADULT&t="+t
 
