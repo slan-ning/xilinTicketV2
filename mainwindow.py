@@ -67,6 +67,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         try:
             self._my12306.login(username, password, auth_code)
+            self._my12306.load_search_page()
             self.show_message('登陆成功!')
         except C12306Error as e:
             self.show_message(e.value)

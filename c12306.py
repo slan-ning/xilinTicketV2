@@ -16,6 +16,8 @@ class C12306:
     http = requests.session()
     leftTicketUrl="leftTicket/query"
     stationCode = {}
+    loginDynamicKey=''
+    loginDynamicVal=''
 
     def __init__(self,domain=''):
         if domain!='':
@@ -30,11 +32,9 @@ class C12306:
             raise C12306Error('初始化页面错误')
 
         dynamic_js_url = xlstr.substr(res.text, "src=\"/otn/dynamicJs/", "\"")
-        self.http.get("https://"+self.domain+"/otn/dynamicJs/" + dynamic_js_url, verify=False,headers=headers)
-
-        leftText=self.http.get("https://kyfw.12306.cn/otn/leftTicket/init",verify=False,headers=headers).text
-        self.leftTicketUrl=xlstr.substr(leftText,"var CLeftTicketUrl = '","'")
-
+        ret=self.http.get("https://"+self.domain+"/otn/dynamicJs/" + dynamic_js_url, verify=False,headers=headers).text
+        self.loginDynamicKey=xlstr.substr(ret,"gc(){var key='","'")
+        self.loginDynamicVal=urllib.parse.quote_plus(xxtea.encrypt("1111",self.loginDynamicKey))
 
         self.load_station_code()
 
@@ -66,13 +66,14 @@ class C12306:
         self.password = password
 
         data = {'loginUserDTO.user_name': self.username, 'userDTO.password': self.password, 'randCode': auth_code}
+        data[self.loginDynamicKey]=self.loginDynamicVal
         headers = {'X-Requested-With': 'XMLHttpRequest','host':self.host}
 
         res = self.http.post("https://" + self.domain + "/otn/login/loginAysnSuggest", data, verify=False,
                              headers=headers)
 
         if not 'loginCheck":"Y"},"' in res.text:
-            print(res.text.encode('gbk').decode('utf-8'))
+            print(res.text)
             raise C12306Error('登录失败:' + ''.join(res.json()['messages']))
 
         return True
@@ -87,6 +88,16 @@ class C12306:
         assert isinstance(res, requests.Response)
         return res.content
 
+    def load_search_page(self):
+        headers={'Referer':'https://kyfw.12306.cn/otn/login/init',"host":self.host}
+        leftText=self.http.get("https://kyfw.12306.cn/otn/leftTicket/init",verify=False,headers=headers).text
+        self.leftTicketUrl=xlstr.substr(leftText,"var CLeftTicketUrl = '","'")
+
+        dynamic_js_url = xlstr.substr(leftText, "src=\"/otn/dynamicJs/", "\"")
+        ret=self.http.get("https://"+self.domain+"/otn/dynamicJs/" + dynamic_js_url, verify=False,headers=headers).text
+
+        self.searchDynamicKey=xlstr.substr(ret,"gc(){var key='","'")
+        self.searchDynamicVal=urllib.parse.quote_plus(xxtea.encrypt("1111",self.searchDynamicKey))
 
     def search_ticket(self, fromStation, toStation, date):
 
@@ -95,7 +106,7 @@ class C12306:
         t=str(random.random())
         url='https://' + self.domain + '/otn/'+self.leftTicketUrl+'?leftTicketDTO.train_date='+date\
             +"&leftTicketDTO.from_station="+self.stationCode[fromStation]+"&leftTicketDTO.to_station="+\
-            self.stationCode[toStation]+"&purpose_codes=ADULT&t="+t
+            self.stationCode[toStation]+"&purpose_codes=ADULT"
 
         res = self.http.get(url,verify=False,headers=headers)
         ticketInfo=res.json()
@@ -116,7 +127,7 @@ class C12306:
         """
         data='secretStr='+ticket.secret_str+'&train_date='+ticket.train_date+'&back_train_date='+ticket.train_date+\
               '&tour_flag=dc&purpose_codes=ADULT&query_from_station_name='+ticket.from_station_name+\
-              '&query_to_station_name='+ticket.to_station_name+'&undefined'
+              '&query_to_station_name='+ticket.to_station_name+'&undefined&'+self.searchDynamicKey+"="+self.searchDynamicVal
         headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init','X-Requested-With':'XMLHttpRequest'\
             ,'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',"host":self.host}
 
