@@ -72,6 +72,7 @@ class C12306:
                              headers=headers)
 
         if not 'loginCheck":"Y"},"' in res.text:
+            print(res.text.encode('gbk').decode('utf-8'))
             raise C12306Error('登录失败:' + ''.join(res.json()['messages']))
 
         return True
@@ -99,6 +100,7 @@ class C12306:
         res = self.http.get(url,verify=False,headers=headers)
         ticketInfo=res.json()
         if ticketInfo['status']!=True or ticketInfo['messages']!=[] :
+            print(ticketInfo)
             raise C12306Error('查询错误:'+''.join(ticketInfo['messages']))
 
         if len(ticketInfo['data'])<=0:
