@@ -34,7 +34,7 @@ class C12306:
         dynamic_js_url = xlstr.substr(res.text, "src=\"/otn/dynamicJs/", "\"")
         ret=self.http.get("https://"+self.domain+"/otn/dynamicJs/" + dynamic_js_url, verify=False,headers=headers).text
         self.loginDynamicKey=xlstr.substr(ret,"gc(){var key='","'")
-        self.loginDynamicVal=urllib.parse.quote_plus(xxtea.encrypt("1111",self.loginDynamicKey))
+        self.loginDynamicVal=(xxtea.encrypt("1111",self.loginDynamicKey))
 
 
 
@@ -67,9 +67,10 @@ class C12306:
         self.username = username
         self.password = password
 
-        data = {'loginUserDTO.user_name': self.username, 'userDTO.password': self.password, 'randCode': auth_code}
+        data = {'loginUserDTO.user_name': self.username, 'userDTO.password': self.password, 'randCode': auth_code\
+            ,"randCode_validate":"","myversion":"undefined"}
         data[self.loginDynamicKey]=self.loginDynamicVal
-        headers = {'X-Requested-With': 'XMLHttpRequest','host':self.host}
+        headers = {'X-Requested-With': 'XMLHttpRequest','host':self.host,"Referer":"https://kyfw.12306.cn/otn/login/init"}
 
         res = self.http.post("https://" + self.domain + "/otn/login/loginAysnSuggest", data, verify=False,
                              headers=headers)
