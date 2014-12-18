@@ -20,9 +20,9 @@ a rapid buy ticket tool for 12306.cn
 
 ## 如何使用
 
-1. 安装python
+1. 安装python3.4
 
-  下载地址：http://us.xiaoqin.in/python-3.4.2.msi
+  下载地址：https://www.python.org/ftp/python/3.4.2/python-3.4.2.msi
 
   安装时，一路next，这个要勾上
 
@@ -32,7 +32,7 @@ a rapid buy ticket tool for 12306.cn
 
 2. 安装pyqt5
 
-  下载地址：http://us.xiaoqin.in/PyQt5-5.3.2-gpl-Py3.4-Qt5.3.1-x32.exe 
+  下载地址：http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.3.2/PyQt5-5.3.2-gpl-Py3.4-Qt5.3.1-x32.exe
   
   一路next
   
