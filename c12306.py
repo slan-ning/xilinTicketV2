@@ -5,6 +5,7 @@ import urllib.parse
 import urllib
 import xxtea
 import random
+import time
 
 
 
@@ -67,10 +68,17 @@ class C12306:
         self.username = username
         self.password = password
 
+        headers = {'X-Requested-With': 'XMLHttpRequest','host':self.host,"Referer":"https://kyfw.12306.cn/otn/login/init"}
+
+        checkData={"randCode":auth_code,"rand":"sjrand","randCode_validate":""}
+        self.http.post("https://" + self.domain + "/otn/passcodeNew/checkRandCodeAnsyn",checkData,verify=False,headers=headers)
+        time.sleep(1)
+
+
         data = {'loginUserDTO.user_name': self.username, 'userDTO.password': self.password, 'randCode': auth_code\
             ,"randCode_validate":"","myversion":"undefined"}
         data[self.loginDynamicKey]=self.loginDynamicVal
-        headers = {'X-Requested-With': 'XMLHttpRequest','host':self.host,"Referer":"https://kyfw.12306.cn/otn/login/init"}
+
 
         res = self.http.post("https://" + self.domain + "/otn/login/loginAysnSuggest", data, verify=False,
                              headers=headers)
@@ -150,6 +158,8 @@ class C12306:
 
         data=data.encode()
 
+        self.http.post('https://'+self.domain+'/otn/login/checkUser',{"_json_att":""},verify=False,headers=headers)
+
         res=self.http.post('https://'+self.domain+'/otn/leftTicket/submitOrderRequest',data,verify=False,headers=headers)
 
         orderInfo=res.json()
@@ -171,7 +181,6 @@ class C12306:
         self.dynamicVal=xxtea.encrypt("1111",self.dynamicKey)
         self.dynamicVal=urllib.parse.quote_plus(self.dynamicVal)
 
-
         if  len(self.Token)!=32 :
             raise C12306Error('预定页面获取失败!')
 
@@ -181,6 +190,18 @@ class C12306:
     def check_order(self,Ticket,passengerList,randCode):
         if len(passengerList)<1 :
             raise C12306Error('没有勾选乘客，无法购票!')
+
+        headers={'Referer':'https://kyfw.12306.cn/otn/confirmPassenger/initDc','X-Requested-With':'XMLHttpRequest'\
+            ,'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',"host":self.host}
+
+        checkData={"randCode":randCode,"rand":"randp","REPEAT_SUBMIT_TOKEN":self.Token}
+        ret=self.http.post("https://" + self.domain + "/otn/passcodeNew/checkRandCodeAnsyn",checkData,verify=False,headers=headers)
+        ret=ret.json()
+        time.sleep(0.2)
+
+        if(ret['status']!=True or ret['data']['result']!=1):
+            print(ret)
+            return False
 
         ticketInfo=[]
         oldPassengerInfo=[]
@@ -197,8 +218,6 @@ class C12306:
              +"&oldPassengerStr="+oldPassengerStrs+"&tour_flag=dc&randCode="+randCode+"&"+self.dynamicKey+"="+self.dynamicVal+\
              "&_json_att=&REPEAT_SUBMIT_TOKEN="+self.Token
 
-        headers={'Referer':'https://kyfw.12306.cn/otn/confirmPassenger/initDc','X-Requested-With':'XMLHttpRequest'\
-            ,'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',"host":self.host}
 
         pstr=pstr.encode()
 
