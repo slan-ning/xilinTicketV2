@@ -37,7 +37,11 @@ class C12306:
         self.loginDynamicKey=xlstr.substr(ret,"gc(){var key='","'")
         self.loginDynamicVal=(xxtea.encrypt("1111",self.loginDynamicKey))
 
-
+        #隐藏的监测url
+        ready_str=xlstr.substr(ret,"$(document).ready(",")};")
+        if ready_str.find("jq({url")>0 :
+            checkHelperUrl=xlstr.substr(ready_str,"jq({url :'","'")
+            self.http.get("https://"+self.domain+checkHelperUrl,verify=False,headers=headers)
 
         self.load_station_code()
 
@@ -101,11 +105,17 @@ class C12306:
 
     def load_search_page(self):
         headers={'Referer':'https://kyfw.12306.cn/otn/login/init',"host":self.host}
-        leftText=self.http.get("https://kyfw.12306.cn/otn/leftTicket/init",verify=False,headers=headers).text
+        leftText=self.http.get("https://"+self.domain+"/otn/leftTicket/init",verify=False,headers=headers).text
         self.leftTicketUrl=xlstr.substr(leftText,"var CLeftTicketUrl = '","'")
 
         dynamic_js_url = xlstr.substr(leftText, "src=\"/otn/dynamicJs/", "\"")
         ret=self.http.get("https://"+self.domain+"/otn/dynamicJs/" + dynamic_js_url, verify=False,headers=headers).text
+
+        #隐藏的监测url
+        ready_str=xlstr.substr(ret,"$(document).ready(",")};")
+        if ready_str.find("jq({url")>0 :
+            checkHelperUrl=xlstr.substr(ready_str,"jq({url :'","'")
+            self.http.get("https://"+self.domain+checkHelperUrl,verify=False,headers=headers)
 
         self.searchDynamicKey=xlstr.substr(ret,"gc(){var key='","'")
         self.searchDynamicVal=urllib.parse.quote_plus(xxtea.encrypt("1111",self.searchDynamicKey))
@@ -177,6 +187,13 @@ class C12306:
         dynamic_js_url = xlstr.substr(res.text, "src=\"/otn/dynamicJs/", "\"");
         dynamic_js = self.http.get("https://"+self.domain +"/otn/dynamicJs/"+ dynamic_js_url, verify=False,headers=headers)
 
+
+        #隐藏的监测url
+        ready_str=xlstr.substr(dynamic_js.text,"$(document).ready(",")};")
+        if ready_str.find("jq({url")>0 :
+            checkHelperUrl=xlstr.substr(ready_str,"jq({url :'","'")
+            self.http.get("https://"+self.domain+checkHelperUrl,verify=False,headers=headers)
+
         self.dynamicKey=xlstr.substr(dynamic_js.text,"gc(){var key='","'")
         self.dynamicVal=xxtea.encrypt("1111",self.dynamicKey)
         self.dynamicVal=urllib.parse.quote_plus(self.dynamicVal)
@@ -197,9 +214,9 @@ class C12306:
         checkData={"randCode":randCode,"rand":"randp","REPEAT_SUBMIT_TOKEN":self.Token}
         ret=self.http.post("https://" + self.domain + "/otn/passcodeNew/checkRandCodeAnsyn",checkData,verify=False,headers=headers)
         ret=ret.json()
-        time.sleep(0.2)
+        time.sleep(1)
 
-        if(ret['status']!=True or ret['data']['result']!=1):
+        if(ret['status']!=True or ret['data']['result']!='1'):
             print(ret)
             return False
 
