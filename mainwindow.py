@@ -147,7 +147,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.searchBtn.setChecked(False)
                 self.search(False)
                 for ticket in ticketList:
-                    self.buyTicket(ticket)
+                    if self.buying:
+                        self.buyTicket(ticket)
             else:
                 self.show_message('没有合适的票')
 
@@ -227,7 +228,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 thread.stop()
 
             for ticket in ticketList:
-                self.buyTicket(ticket)
+                if self.buying:
+                    self.buyTicket(ticket)
             self.search(False)
         else:
             self.show_message('没有合适的票')
