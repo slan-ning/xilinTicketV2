@@ -23,8 +23,12 @@ class C12306:
     def __init__(self,domain=''):
         if domain!='':
             self.domain=domain
+        self.load_login_page()
+        self.load_station_code()
 
-        headers={"host":self.host}
+    def load_login_page(self):
+
+        headers = {'X-Requested-With': 'XMLHttpRequest','host':self.host,"Referer":"https://kyfw.12306.cn/otn/login/init"}
         self.http.get("https://" + self.domain + "/otn/", verify=False,headers=headers)
         res = self.http.get('https://'+self.domain+'/otn/login/init', verify=False,headers=headers)
         assert isinstance(res, requests.Response)
@@ -43,7 +47,6 @@ class C12306:
             checkHelperUrl=xlstr.substr(ready_str,"jq({url :'","'")
             self.http.get("https://"+self.domain+checkHelperUrl,verify=False,headers=headers)
 
-        self.load_station_code()
 
     def load_station_code(self):
         """Load station telcode from 12306.cn
@@ -51,8 +54,8 @@ class C12306:
         加载车站电报码，各个请求中会用到
         :raise C12306Error:
         """
-        header={"host":self.host}
-        res = requests.get('https://'+self.domain+'/otn/resources/js/framework/station_name.js', verify=False,headers=header)
+        headers = {'X-Requested-With': 'XMLHttpRequest','host':self.host,"Referer":"https://kyfw.12306.cn/otn/login/init"}
+        res = requests.get('https://'+self.domain+'/otn/resources/js/framework/station_name.js', verify=False,headers=headers)
         if res.status_code != 200:
             raise C12306Error('加载车站信息错误,请重开!')
 
