@@ -111,6 +111,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 configfile.close()
             self.passager_table.save_to_config()
 
+            self._my12306.load_search_page()
+
             if self.cb_rob_mode.checkState()==Qt.Checked :
                 self.search_thread_start()
             else:
