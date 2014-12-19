@@ -306,6 +306,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             buying=False
             self.show_message(e.value)
 
+        finally:
+            self._my12306.load_search_page()
+
 
     def show_message(self,msg):
         self.memo.ensureCursorVisible()
