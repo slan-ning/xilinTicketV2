@@ -241,7 +241,7 @@ class C12306:
 
         pstr=pstr.encode()
 
-        res=self.http.post('https://'+self.domain+'/otn/confirmPassenger/checkOrderInfo',pstr,headers=headers)
+        res=self.http.post('https://'+self.domain+'/otn/confirmPassenger/checkOrderInfo',pstr,verify=False,headers=headers)
 
         orderInfo=res.json()
         if orderInfo['status']!=True:
@@ -257,7 +257,7 @@ class C12306:
                  Ticket.yp_info+"&purpose_codes=00&_json_att=&REPEAT_SUBMIT_TOKEN="+self.Token
 
             pstr=pstr.encode()
-            res=self.http.post('https://'+self.domain+'/otn/confirmPassenger/getQueueCount',pstr,headers=headers).json()
+            res=self.http.post('https://'+self.domain+'/otn/confirmPassenger/getQueueCount',pstr,verify=False,headers=headers).json()
 
             if res['status']!=True:
                 raise C12306Error('查询排队队列错误:'+''.join(res['messages']))
@@ -279,7 +279,7 @@ class C12306:
         headers={'Referer':'https://kyfw.12306.cn/otn/confirmPassenger/initDc','X-Requested-With':'XMLHttpRequest'\
             ,'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',"host":self.host}
 
-        res=self.http.post("https://"+self.domain+"/otn/confirmPassenger/confirmSingleForQueue",pstr,headers=headers).json()
+        res=self.http.post("https://"+self.domain+"/otn/confirmPassenger/confirmSingleForQueue",pstr,verify=False,headers=headers).json()
 
         if res['status']==True :
             return True
@@ -292,7 +292,7 @@ class C12306:
         print("keep online")
         headers={'Referer':'https://kyfw.12306.cn/otn/leftTicket/init','X-Requested-With':'XMLHttpRequest'\
             ,'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',"host":self.host}
-        self.http.get("https://"+self.domain+"/otn/queryOrder/initNoComplete",headers={"host":self.host})
+        self.http.get("https://"+self.domain+"/otn/queryOrder/initNoComplete",verify=False,headers={"host":self.host})
 
 
 class C12306Error(Exception):
